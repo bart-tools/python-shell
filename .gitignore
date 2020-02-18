@@ -1,0 +1,13 @@
+.tox
+.coverage
+*.pyc
+*.pyo
+*.swp
+.venv
+.env
+*egg-info
+htmlcov
+.idea
+dist
+build
+
