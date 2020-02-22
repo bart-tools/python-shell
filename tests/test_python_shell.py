@@ -52,4 +52,3 @@ class ShellTestCase(unittest.TestCase):
         """Check command errors property"""
         self.skipTest("Cannot test it right now - need more functionality")
         # FIXME(albartash): Implement this test
-
