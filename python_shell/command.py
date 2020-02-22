@@ -127,3 +127,11 @@ class Command(ICommand):
             return self._process._stdout
         else:
             return self._process.stdout.decode()
+
+    def __str__(self):
+        """Returns command's output as a string"""
+        return self.output
+
+    def __repr__(self):
+        """Returns command's execution string"""
+        return ' '.join((self.command, self.arguments))
