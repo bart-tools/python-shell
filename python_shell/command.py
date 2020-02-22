@@ -26,11 +26,11 @@ from io import open
 import itertools
 import os
 import subprocess
-import sys
 
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.interfaces import ICommand
+from python_shell.util import is_python2_running
 
 
 __all__ = ('Command',)
@@ -42,24 +42,23 @@ class Subprocess(object):
     @staticmethod
     def run(*args, **kwargs):
         """A simple wrapper for run() method of subprocess"""
-        if sys.version_info[0] == 3:
-            return subprocess.run(*args, **kwargs)
-        else:
+        if is_python2_running():
             if 'check' in kwargs:
                 kwargs.pop('check')
             process = subprocess.Popen(*args, **kwargs)
             stdout = process.communicate()[0]
             process._stdout = stdout
             return process
+        else:
+            return subprocess.run(*args, **kwargs)
 
     @staticmethod
     def DEVNULL():
         """A wrapper for DEVNULL which does not exist in Python 2"""
-
-        if sys.version_info[0] == 3:
-            return subprocess.DEVNULL
-        else:
+        if is_python2_running():
             return open(os.devnull, 'w')
+        else:
+            return subprocess.DEVNULL
 
 
 class Command(ICommand):
@@ -124,7 +123,7 @@ class Command(ICommand):
     @property
     def output(self):
         """Returns a string output of the invoked command"""
-        if sys.version_info[0] == 3:
-            return self._process.stdout.decode()
-        else:
+        if is_python2_running():
             return self._process._stdout
+        else:
+            return self._process.stdout.decode()
