@@ -31,9 +31,23 @@ __all__ = ('Shell',)
 
 
 class __MetaShell(type):
-    def __getattribute__(cls, item):
-        return Command(item)
+
+    __own_fields__ = ('last_command',)
+
+    def __getattr__(cls, item):
+        if item in cls.__own_fields__:
+            return cls.__dict__[item]
+        else:
+            cls._last_command = Command(item)
+            return cls._last_command
+
+    @property
+    def last_command(cls):
+        """Returns last executed command"""
+        return cls._last_command
 
 
 class Shell(with_metaclass(__MetaShell)):
     """Simple decorator for Terminal using Subprocess"""
+
+    _last_command = None

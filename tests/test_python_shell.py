@@ -84,3 +84,10 @@ class ShellTestCase(unittest.TestCase):
         self.assertEqual(str(context.exception),
                          'Shell command "mkdir /tmp" failed '
                          'with return code 1')
+
+    def test_last_command(self):
+        """Check "last_command" property to be working"""
+        command = Shell.mkdir('-p', '/tmp')
+        self.assertEqual(Shell.last_command.command, 'mkdir')
+        self.assertEqual(Shell.last_command.arguments, '-p /tmp')
+        self.assertEqual(command, Shell.last_command)
