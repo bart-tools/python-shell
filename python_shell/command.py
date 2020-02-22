@@ -22,42 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from io import open
+
 import itertools
-import os
-import subprocess
 
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.interfaces import ICommand
 from python_shell.util import is_python2_running
+from python_shell.util import Subprocess
 
 
 __all__ = ('Command',)
-
-
-class Subprocess(object):
-    """A wrapper for subprocess module"""
-
-    @staticmethod
-    def run(*args, **kwargs):
-        """A simple wrapper for run() method of subprocess"""
-        if is_python2_running():
-            if 'check' in kwargs:
-                kwargs.pop('check')
-            process = subprocess.Popen(*args, **kwargs)
-            process._stdout, process._stderr = process.communicate()
-            return process
-        else:
-            return subprocess.run(*args, **kwargs)
-
-    @staticmethod
-    def DEVNULL():
-        """A wrapper for DEVNULL which does not exist in Python 2"""
-        if is_python2_running():
-            return open(os.devnull, 'w')
-        else:
-            return subprocess.DEVNULL
 
 
 class Command(ICommand):
@@ -72,9 +47,7 @@ class Command(ICommand):
             Subprocess.run(("which", command_name),
                            check=True,
                            stdout=Subprocess.DEVNULL())
-        except subprocess.CalledProcessError:
-            raise CommandDoesNotExist(self)
-        except OSError:  # for Python 2
+        except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)
 
     @staticmethod
@@ -99,7 +72,7 @@ class Command(ICommand):
         self._process = Subprocess.run(
             self._make_command_execution_list(
                 args, kwargs),
-            stdout=subprocess.PIPE)
+            stdout=Subprocess.PIPE)
         if self._process.returncode:
             raise ShellException(self)
         return self

@@ -22,25 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import sys
-import unittest
+import abc
 
-from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
-from python_shell.util import is_python2_running
-from python_shell.util import get_current_terminal_name
+from .interfaces import ITerminalIntegration
 
 
-__all__ = ('UtilTestCase',)
+__all__ = ('BaseTerminalIntegration',)
 
 
-class UtilTestCase(unittest.TestCase):
-    """Test case for utils"""
+class BaseTerminalIntegration(ITerminalIntegration):
+    """Base class for terminal integrations"""
 
-    def test_python_version_checker(self):
-        """Check if python version checker works properly"""
-        self.assertEqual(is_python2_running(), sys.version_info[0] == 2)
+    _shell_name = None  # Shell name, like 'bash', 'zsh', etc.
 
-    def test_get_current_terminal_name(self):
-        """Check that getting current terminal name works"""
-        self.assertIn(get_current_terminal_name(),
-                      TERMINAL_INTEGRATION_MAP.keys())
+    @property
+    def shell_name(self):
+        """Returns a name of shell used in this integration"""
+        return self._shell_name
+
+    @property
+    @abc.abstractmethod
+    def available_commands(self):
+        """Returns list of available executable commands in the shell"""
+        raise NotImplementedError
