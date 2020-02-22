@@ -131,7 +131,7 @@ class Command(ICommand):
     def errors(self):
         """Returns a string output of the invoked command from stderr """
         if is_python2_running():
-            return return self._process._stderr
+            return self._process._stderr
         else:
             return self._process.stderr.decode() if self._process.stderr else ""
 
