@@ -53,5 +53,11 @@ class ICommand(with_metaclass(abc.ABCMeta)):
     @property
     @abc.abstractmethod
     def output(self):
-        """Returns a string output of the invoked command"""
+        """Returns a string output of the invoked command from stdout"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def errors(self):
+        """Returns a string output of the invoked command from stderr"""
         raise NotImplementedError
