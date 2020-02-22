@@ -22,58 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import os
-import sys
-import tempfile
-import time
 import unittest
 
-from python_shell.command import Command
-from python_shell.exceptions import CommandDoesNotExist
+
 from python_shell.exceptions import ShellException
 from python_shell.shell import Shell
 
 
-__all__ = ('CommandTestCase', 'ShellTestCase')
-
-
-class CommandTestCase(unittest.TestCase):
-    FILES_COUNT = 5
-
-    def setUp(self):
-        self.tmp_folder = tempfile.mkdtemp()
-
-    def tearDown(self):
-        os.rmdir(self.tmp_folder)
-
-    def test_existing_command(self):
-        """Check that existing command runs correctly"""
-
-        command = Command('ls')
-        command(self.tmp_folder)
-        self.assertEqual(command.return_code, 0)
-
-    def test_non_existing_command_python_2(self):
-        """Check when command does not exist in Python 2"""
-
-        if sys.version_info[0] != 2:
-            self.skipTest('Only for Python 2')
-        with self.assertRaises(OSError):
-            Command('random_{}'.format(time.time()))()
-
-    def test_non_existing_command_python_3(self):
-        """Check when command does not exist in Python 3"""
-
-        if sys.version_info[0] != 3:
-            self.skipTest('Only for Python 3')
-        with self.assertRaises(CommandDoesNotExist):
-            Command('random_{}'.format(time.time()))()
-
-    def test_command_output(self):
-        """Check command output property"""
-        value = str(time.time())
-        command = Command('echo')(value)
-        self.assertEqual(command.output, "{}\n".format(value))
+__all__ = ('ShellTestCase',)
 
 
 class ShellTestCase(unittest.TestCase):
