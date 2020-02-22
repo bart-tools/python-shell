@@ -22,25 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import sys
-import unittest
-
-from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
-from python_shell.util import is_python2_running
-from python_shell.util import get_current_terminal_name
+import os
 
 
-__all__ = ('UtilTestCase',)
+__all__ = ('get_current_terminal_name',)
 
 
-class UtilTestCase(unittest.TestCase):
-    """Test case for utils"""
+def get_current_terminal_name():
+    """Retrieve name of currently active terminal
 
-    def test_python_version_checker(self):
-        """Check if python version checker works properly"""
-        self.assertEqual(is_python2_running(), sys.version_info[0] == 2)
-
-    def test_get_current_terminal_name(self):
-        """Check that getting current terminal name works"""
-        self.assertIn(get_current_terminal_name(),
-                      TERMINAL_INTEGRATION_MAP.keys())
+    NOTE(albartash): Currently retrieves name using $SHELL variable which
+                     is not quite good. Also not sure if work on Windows.
+    TODO(albartash): Replace logic for better one to retrieve a proper
+                     terminal name
+    """
+    return os.environ['SHELL'].split('/')[-1]

@@ -22,32 +22,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from six import with_metaclass
+from io import open
+import os
+import subprocess
 
-from python_shell.command import Command
+from .version import is_python2_running
 
 
-__all__ = ('Shell',)
+__all__ = ('Subprocess',)
 
 
-class __MetaShell(type):
+_PIPE = subprocess.PIPE
 
-    __own_fields__ = ('last_command',)
+if is_python2_running():
+    _CalledProcessError = OSError
+else:
+    _CalledProcessError = subprocess.CalledProcessError
 
-    def __getattr__(cls, item):
-        if item in cls.__own_fields__:
-            return cls.__dict__[item]
+
+class Subprocess(object):
+    """A wrapper for subprocess module"""
+
+    CalledProcessError = _CalledProcessError
+    PIPE = _PIPE
+
+    @staticmethod
+    def run(*args, **kwargs):
+        """A simple wrapper for run() method of subprocess"""
+        if is_python2_running():
+            if 'check' in kwargs:
+                kwargs.pop('check')
+            process = subprocess.Popen(*args, **kwargs)
+            process._stdout, process._stderr = process.communicate()
+            return process
         else:
-            cls._last_command = Command(item)
-            return cls._last_command
+            return subprocess.run(*args, **kwargs)
 
-    @property
-    def last_command(cls):
-        """Returns last executed command"""
-        return cls._last_command
-
-
-class Shell(with_metaclass(__MetaShell)):
-    """Simple decorator for Terminal using Subprocess"""
-
-    _last_command = None
+    @classmethod
+    def DEVNULL(cls):
+        """A wrapper for DEVNULL which does not exist in Python 2"""
+        if is_python2_running():
+            return open(os.devnull, 'w')
+        else:
+            return subprocess.DEVNULL

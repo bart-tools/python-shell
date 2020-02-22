@@ -22,25 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import sys
-import unittest
-
-from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
+from python_shell.shell.terminal.base import BaseTerminalIntegration
 from python_shell.util import is_python2_running
-from python_shell.util import get_current_terminal_name
+from python_shell.util import Subprocess
 
 
-__all__ = ('UtilTestCase',)
+__all__ = ('BashTerminalIntegration',)
 
 
-class UtilTestCase(unittest.TestCase):
-    """Test case for utils"""
+class BashTerminalIntegration(BaseTerminalIntegration):
+    """Terminal integration for Bash"""
 
-    def test_python_version_checker(self):
-        """Check if python version checker works properly"""
-        self.assertEqual(is_python2_running(), sys.version_info[0] == 2)
+    _shell_name = "bash"
+    _available_commands = None
 
-    def test_get_current_terminal_name(self):
-        """Check that getting current terminal name works"""
-        self.assertIn(get_current_terminal_name(),
-                      TERMINAL_INTEGRATION_MAP.keys())
+    def __init__(self):
+        super(BashTerminalIntegration, self).__init__()
+
+    def _get_available_commands(self):
+        """Reload available commands from shell"""
+        process = Subprocess.run([self._shell_name, '-c', 'compgen -c'],
+                                 stdout=Subprocess.PIPE,
+                                 stderr=Subprocess.DEVNULL())
+        if is_python2_running():
+            output = process._stdout
+        else:
+            output = process.stdout.decode()
+        return output.split()
+
+    @property
+    def available_commands(self):
+        """Returns list of available executable commands in the shell"""
+        if self._available_commands is None:
+            self._available_commands = self._get_available_commands()
+        return self._available_commands

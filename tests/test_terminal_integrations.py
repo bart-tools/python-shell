@@ -24,31 +24,23 @@ THE SOFTWARE.
 
 import unittest
 
+from python_shell.shell import terminal
 
-from python_shell.exceptions import ShellException
-from python_shell.shell import Shell
-
-
-__all__ = ('ShellTestCase',)
+__all__ = ('TerminalIntegrationTestCase',)
 
 
-class ShellTestCase(unittest.TestCase):
-    def test_shell_non_zero_return_code(self):
-        """Check the case when Shell command returns non-zero code"""
-        with self.assertRaises(ShellException) as context:
-            Shell.mkdir('/tmp')
-        self.assertEqual(str(context.exception),
-                         'Shell command "mkdir /tmp" failed '
-                         'with return code 1')
+class TerminalIntegrationTestCase(unittest.TestCase):
+    """Abstract Test case for terminal integration"""
 
-    def test_last_command(self):
-        """Check "last_command" property to be working"""
-        command = Shell.mkdir('-p', '/tmp')
-        self.assertEqual(Shell.last_command.command, 'mkdir')
-        self.assertEqual(Shell.last_command.arguments, '-p /tmp')
-        self.assertEqual(command, Shell.last_command)
+    def _test_terminal_available_commands(self, integration_class_name):
+        """Check available commands to be non-empty list"""
+        term = getattr(terminal, integration_class_name)()
+        self.assertLess(0, len(term.available_commands))
 
-    def test_command_errors(self):
-        """Check command errors property"""
-        self.skipTest("Cannot test it right now - need more functionality")
-        # FIXME(albartash): Implement this test
+
+class BashTerminalIntegrationTestCase(TerminalIntegrationTestCase):
+    """Test case for Bash terminal integration"""
+
+    def test_bash_available_commands(self):
+        """Check if Bash available commands can be retrieved"""
+        self._test_terminal_available_commands('BashTerminalIntegration')

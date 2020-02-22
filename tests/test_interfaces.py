@@ -25,6 +25,7 @@ THE SOFTWARE.
 import unittest
 
 from python_shell.interfaces import ICommand
+from python_shell.shell.terminal.interfaces import ITerminalIntegration
 
 
 __all__ = ('CommandInterfaceTestCase',)
@@ -72,3 +73,31 @@ class CommandInterfaceTestCase(unittest.TestCase):
                           'errors'):
             with self.assertRaises(NotImplementedError):
                 getattr(self._command, prop_name)
+
+
+class FakeTerminal(ITerminalIntegration):
+    """Fake terminal for testing ITerminalIntegration interface"""
+
+    @property
+    def available_commands(self):
+        return super(FakeTerminal, self).available_commands
+
+    @property
+    def shell_name(self):
+        return super(FakeTerminal, self).available_commands
+
+
+class TerminalInterfaceTestCase(unittest.TestCase):
+    """Test case for ITerminalIntegration"""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TerminalInterfaceTestCase, cls).setUpClass()
+        cls._terminal = FakeTerminal()
+
+    def test_public_properties_are_abstract(self):
+        """Check that all properties are abstract"""
+
+        for prop_name in ('available_commands', 'shell_name'):
+            with self.assertRaises(NotImplementedError):
+                getattr(self._terminal, prop_name)
