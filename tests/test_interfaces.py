@@ -49,6 +49,10 @@ class FakeCommand(ICommand):
         return super(FakeCommand, self).output
 
     @property
+    def errors(self):
+        return super(FakeCommand, self).errors
+
+    @property
     def return_code(self):
         return super(FakeCommand, self).return_code
 
@@ -64,6 +68,7 @@ class CommandInterfaceTestCase(unittest.TestCase):
     def test_public_properties_are_abstract(self):
         """Check that all properties are abstract"""
 
-        for prop_name in ('output', 'arguments', 'command', 'return_code'):
+        for prop_name in ('output', 'arguments', 'command', 'return_code',
+                          'errors'):
             with self.assertRaises(NotImplementedError):
                 getattr(self._command, prop_name)

@@ -31,6 +31,11 @@ from python_shell.shell import Shell
 
 __all__ = ('ShellTestCase',)
 
+    def test_command_errors(self):
+        """Check command errors property"""
+        self.skipTest("Cannot test it right now - need more functionality")
+        # FIXME(albartash): Implement this test
+
 
 class ShellTestCase(unittest.TestCase):
     def test_shell_non_zero_return_code(self):

@@ -46,8 +46,7 @@ class Subprocess(object):
             if 'check' in kwargs:
                 kwargs.pop('check')
             process = subprocess.Popen(*args, **kwargs)
-            stdout = process.communicate()[0]
-            process._stdout = stdout
+            process._stdout, process._stderr = process.communicate()
             return process
         else:
             return subprocess.run(*args, **kwargs)
@@ -126,7 +125,15 @@ class Command(ICommand):
         if is_python2_running():
             return self._process._stdout
         else:
-            return self._process.stdout.decode()
+            return self._process.stdout.decode() if self._process.stdout else ""
+
+    @property
+    def errors(self):
+        """Returns a string output of the invoked command from stderr """
+        if is_python2_running():
+            return return self._process._stderr
+        else:
+            return self._process.stderr.decode() if self._process.stderr else ""
 
     def __str__(self):
         """Returns command's output as a string"""
