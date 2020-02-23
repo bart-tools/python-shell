@@ -82,6 +82,10 @@ Other old versions of Python (e.g. 2.6, 3.4, etc) will never be supported. Howev
 
 * **Alex Sokolov** - *Author* - [Albartash](https://github.com/AlBartash)
 
+## Contacts
+
+* Telegram channel with updates: [@bart_tools](http://t.me/bart_tools)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
