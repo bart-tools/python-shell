@@ -25,9 +25,11 @@ THE SOFTWARE.
 import unittest
 
 
+from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.shell import Shell
 from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
+from python_shell.util.process import Subprocess
 from python_shell.util.terminal import get_current_terminal_name
 
 
@@ -56,6 +58,17 @@ class ShellTestCase(unittest.TestCase):
         # FIXME(albartash): Implement this test
 
     def test_dir_shell(self):
+        """Check usage of dir(Shell)"""
         name = get_current_terminal_name()
         commands = TERMINAL_INTEGRATION_MAP[name]().available_commands
         self.assertLess(0, len(commands))
+        commands_dir = dir(Shell)
+        self.assertEqual(sorted(commands + ['last_command']), commands_dir)
+
+    def test_shell_for_non_identifier_command(self):
+        """Check ability to call Shell for non-identifier-like commands"""
+        command_name = '2echo'
+        command = Shell(command_name)
+        with self.assertRaises(CommandDoesNotExist):
+            command()
+        self.assertEqual(Shell.last_command.command, command_name)

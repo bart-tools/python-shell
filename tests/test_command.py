@@ -32,6 +32,7 @@ import unittest
 from python_shell.command import Command
 from python_shell.exceptions import CommandDoesNotExist
 
+
 __all__ = ('CommandTestCase',)
 
 
@@ -51,19 +52,8 @@ class CommandTestCase(unittest.TestCase):
         command(self.tmp_folder)
         self.assertEqual(command.return_code, 0)
 
-    def test_non_existing_command_python_2(self):
+    def test_non_existing_command_python(self):
         """Check when command does not exist in Python 2"""
-
-        if sys.version_info[0] != 2:
-            self.skipTest('Only for Python 2')
-        with self.assertRaises(OSError):
-            Command('random_{}'.format(time.time()))()
-
-    def test_non_existing_command_python_3(self):
-        """Check when command does not exist in Python 3"""
-
-        if sys.version_info[0] != 3:
-            self.skipTest('Only for Python 3')
         with self.assertRaises(CommandDoesNotExist):
             Command('random_{}'.format(time.time()))()
 
