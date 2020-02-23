@@ -61,3 +61,12 @@ class Shell(with_metaclass(__MetaShell)):
     """Simple decorator for Terminal using Subprocess"""
 
     _last_command = None
+
+    def __new__(cls, command_name):
+        """Returns an ICommand instance for specified command_name.
+        This is useful for shell commands which names are not valid
+        in Python terms as identifier.
+
+        NOTE: This is not a constructor, as it could seem to be.
+        """
+        return getattr(cls, command_name)

@@ -38,7 +38,7 @@ __all__ = ('Command',)
 class Command(ICommand):
     """Simple decorator for shell commands"""
 
-    _arguments = None
+    _arguments = []
     _process = None
     _command = None
 
@@ -63,12 +63,12 @@ class Command(ICommand):
 
     def __init__(self, command_name):
         self._command = command_name
-        self._validate_command(command_name)
+        self._process = Process()
 
     def __call__(self, *args, **kwargs):
         """Executes the command with passed arguments
            and returns a Command instance"""
-
+        self._validate_command(self._command)
         self._process = Process(
             Subprocess.run(
                 self._make_command_execution_list(

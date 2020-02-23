@@ -45,22 +45,24 @@ class Process(object):
 
     _process = None  # process instance
 
-    def __init__(self, process):
+    def __init__(self, process=None):
         self._process = process
 
     @property
     def stderr(self):
         """Returns stderr output of process"""
         if is_python2_running():
-            return self._process._stderr
-        return self._process.stderr.decode() if self._process.stderr else ""
+            return self._process._stderr if self._process else ""
+        return self._process.stderr.decode() \
+            if self._process and self._process.stderr else ""
 
     @property
     def stdout(self):
         """Returns stdout output of process"""
         if is_python2_running():
-            return self._process._stdout
-        return self._process.stdout.decode() if self._process.stdout else ""
+            return self._process._stdout if self._process else ""
+        return self._process.stdout.decode() \
+            if self._process and self._process.stdout else ""
 
     @property
     def returncode(self):
@@ -78,10 +80,13 @@ class Subprocess(object):
     def run(*args, **kwargs):
         """A simple wrapper for run() method of subprocess"""
         if is_python2_running():
+            check = False
             if 'check' in kwargs:
-                kwargs.pop('check')
+                check = kwargs.pop('check')
             process = subprocess.Popen(*args, **kwargs)
             process._stdout, process._stderr = process.communicate()
+            if process.returncode and check:
+                raise Subprocess.CalledProcessError
             return process
         else:
             return subprocess.run(*args, **kwargs)

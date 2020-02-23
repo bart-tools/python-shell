@@ -3,8 +3,8 @@
 *.pyc
 *.pyo
 *.swp
-.venv
-.env
+.venv*
+.env*
 *egg-info
 htmlcov
 .idea
