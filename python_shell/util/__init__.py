@@ -27,4 +27,9 @@ from .terminal import *
 from .version import *
 
 
-__all__ = ('is_python2_running', 'get_current_terminal_name', 'Subprocess')
+__all__ = (
+    'is_python2_running',
+    'get_current_terminal_name',
+    'Subprocess',
+    'Process'
+)
