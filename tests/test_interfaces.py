@@ -24,80 +24,46 @@ THE SOFTWARE.
 
 import unittest
 
-from python_shell.interfaces import ICommand
-from python_shell.shell.terminal.interfaces import ITerminalIntegration
+from .fixtures.interfaces import FakeCommand
+from .fixtures.interfaces import FakeTerminal
 
 
-__all__ = ('CommandInterfaceTestCase',)
+__all__ = ('CommandInterfaceTestCase', 'TerminalInterfaceTestCase')
 
 
-class FakeCommand(ICommand):
-    """A tricky class for testing interfaces"""
-
-    def __init__(self):
-        pass
-
-    @property
-    def command(self):
-        return super(FakeCommand, self).command
-
-    @property
-    def arguments(self):
-        return super(FakeCommand, self).arguments
-
-    @property
-    def output(self):
-        return super(FakeCommand, self).output
-
-    @property
-    def errors(self):
-        return super(FakeCommand, self).errors
-
-    @property
-    def return_code(self):
-        return super(FakeCommand, self).return_code
-
-
-class CommandInterfaceTestCase(unittest.TestCase):
-    """Test case for interfaces"""
+class BaseInterfaceTestCase(unittest.TestCase):
+    """Base test case for interfaces"""
+    implementation_class = None  # Interface fake implementation class
+    properties = ()  # List of properties to be checked
 
     @classmethod
     def setUpClass(cls):
-        super(CommandInterfaceTestCase, cls).setUpClass()
-        cls._command = FakeCommand()
+        """Initialize implementation"""
+        super(BaseInterfaceTestCase, cls).setUpClass()
+        cls._instance = cls.implementation_class()
 
-    def test_public_properties_are_abstract(self):
+    def _check_properties(self):
         """Check that all properties are abstract"""
-
-        for prop_name in ('output', 'arguments', 'command', 'return_code',
-                          'errors'):
+        for prop_name in self.properties:
             with self.assertRaises(NotImplementedError):
-                getattr(self._command, prop_name)
+                getattr(self._instance, prop_name)
 
 
-class FakeTerminal(ITerminalIntegration):
-    """Fake terminal for testing ITerminalIntegration interface"""
+class CommandInterfaceTestCase(BaseInterfaceTestCase):
+    """Test case for Command interface"""
 
-    @property
-    def available_commands(self):
-        return super(FakeTerminal, self).available_commands
+    implementation_class = FakeCommand
+    properties = ('output', 'arguments', 'command', 'return_code', 'errors')
 
-    @property
-    def shell_name(self):
-        return super(FakeTerminal, self).available_commands
+    def test_command_interface(self):
+        self._check_properties()
 
 
-class TerminalInterfaceTestCase(unittest.TestCase):
-    """Test case for ITerminalIntegration"""
+class TerminalInterfaceTestCase(BaseInterfaceTestCase):
+    """Test case for Terminal integration interface"""
 
-    @classmethod
-    def setUpClass(cls):
-        super(TerminalInterfaceTestCase, cls).setUpClass()
-        cls._terminal = FakeTerminal()
+    implementation_class = FakeTerminal
+    properties = ('available_commands', 'shell_name')
 
-    def test_public_properties_are_abstract(self):
-        """Check that all properties are abstract"""
-
-        for prop_name in ('available_commands', 'shell_name'):
-            with self.assertRaises(NotImplementedError):
-                getattr(self._terminal, prop_name)
+    def test_terminal_integration_interface(self):
+        self._check_properties()
