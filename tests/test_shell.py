@@ -29,7 +29,6 @@ from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.shell import Shell
 from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
-from python_shell.util.process import Subprocess
 from python_shell.util.terminal import get_current_terminal_name
 
 
