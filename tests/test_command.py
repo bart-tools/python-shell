@@ -52,8 +52,8 @@ class CommandTestCase(unittest.TestCase):
         command(self.tmp_folder)
         self.assertEqual(command.return_code, 0)
 
-    def test_non_existing_command_python(self):
-        """Check when command does not exist in Python 2"""
+    def test_non_existing_command(self):
+        """Check when command does not exist"""
         with self.assertRaises(CommandDoesNotExist):
             Command('random_{}'.format(time.time()))()
 
