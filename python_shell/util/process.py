@@ -29,7 +29,7 @@ import subprocess
 from .version import is_python2_running
 
 
-__all__ = ('Subprocess',)
+__all__ = ('Subprocess', 'Process')
 
 
 _PIPE = subprocess.PIPE
@@ -38,6 +38,34 @@ if is_python2_running():
     _CalledProcessError = OSError
 else:
     _CalledProcessError = subprocess.CalledProcessError
+
+
+class Process(object):
+    """A wrapper for process"""
+
+    _process = None  # process instance
+
+    def __init__(self, process):
+        self._process = process
+
+    @property
+    def stderr(self):
+        """Returns stderr output of process"""
+        if is_python2_running():
+            return self._process._stderr
+        return self._process.stderr.decode() if self._process.stderr else ""
+
+    @property
+    def stdout(self):
+        """Returns stdout output of process"""
+        if is_python2_running():
+            return self._process._stdout
+        return self._process.stdout.decode() if self._process.stdout else ""
+
+    @property
+    def returncode(self):
+        """Returns returncode of process"""
+        return self._process.returncode
 
 
 class Subprocess(object):

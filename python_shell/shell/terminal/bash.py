@@ -23,7 +23,7 @@ THE SOFTWARE.
 """
 
 from python_shell.shell.terminal.base import BaseTerminalIntegration
-from python_shell.util import is_python2_running
+from python_shell.util import Process
 from python_shell.util import Subprocess
 
 
@@ -41,14 +41,14 @@ class BashTerminalIntegration(BaseTerminalIntegration):
 
     def _get_available_commands(self):
         """Reload available commands from shell"""
-        process = Subprocess.run([self._shell_name, '-c', 'compgen -c'],
-                                 stdout=Subprocess.PIPE,
-                                 stderr=Subprocess.DEVNULL())
-        if is_python2_running():
-            output = process._stdout
-        else:
-            output = process.stdout.decode()
-        return output.split()
+        process = Process(
+            Subprocess.run(
+                [self._shell_name, '-c', 'compgen -c'],
+                stdout=Subprocess.PIPE,
+                stderr=Subprocess.DEVNULL()
+            )
+        )
+        return process.stdout.split()
 
     @property
     def available_commands(self):

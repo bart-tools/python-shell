@@ -28,7 +28,7 @@ import itertools
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.interfaces import ICommand
-from python_shell.util import is_python2_running
+from python_shell.util import Process
 from python_shell.util import Subprocess
 
 
@@ -69,10 +69,13 @@ class Command(ICommand):
         """Executes the command with passed arguments
            and returns a Command instance"""
 
-        self._process = Subprocess.run(
-            self._make_command_execution_list(
-                args, kwargs),
-            stdout=Subprocess.PIPE)
+        self._process = Process(
+            Subprocess.run(
+                self._make_command_execution_list(
+                    args, kwargs),
+                stdout=Subprocess.PIPE
+            )
+        )
         if self._process.returncode:
             raise ShellException(self)
         return self
@@ -95,20 +98,12 @@ class Command(ICommand):
     @property
     def output(self):
         """Returns a string output of the invoked command"""
-        if is_python2_running():
-            return self._process._stdout
-        else:
-            return self._process.stdout.decode() if self._process.stdout \
-                                                 else ""
+        return self._process.stdout
 
     @property
     def errors(self):
         """Returns a string output of the invoked command from stderr """
-        if is_python2_running():
-            return self._process._stderr
-        else:
-            return self._process.stderr.decode() if self._process.stderr \
-                                                 else ""
+        return self._process.stderr
 
     def __str__(self):
         """Returns command's output as a string"""
