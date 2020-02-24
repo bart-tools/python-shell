@@ -41,7 +41,7 @@ setup(
     description='Python Shell Wrapper library',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/albartash/python-shell',
+    url='https://github.com/bart-tools/python-shell',
     author='Alex Sokolov',
     author_email='volokos.alex@gmail.com',
     classifiers=[
@@ -59,4 +59,7 @@ setup(
     packages=['python_shell'],
     python_requires='>2.7.*, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4',
     install_requires=['six>=1.14.0'],
+    project_urls={
+        'Source': 'https://github.com/bart-tools/python-shell',
+    },
 )
