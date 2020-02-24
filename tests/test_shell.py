@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import time
 import unittest
 
 
@@ -36,6 +37,13 @@ __all__ = ('ShellTestCase',)
 
 
 class ShellTestCase(unittest.TestCase):
+    """Test case for Shell"""
+
+    def test_own_fields(self):
+        """Check Shell own fields to be accessible"""
+        for field in ('last_command',):
+            getattr(Shell, field)
+
     def test_shell_non_zero_return_code(self):
         """Check the case when Shell command returns non-zero code"""
         with self.assertRaises(ShellException) as context:
@@ -53,8 +61,16 @@ class ShellTestCase(unittest.TestCase):
 
     def test_command_errors(self):
         """Check command errors property"""
-        self.skipTest("Cannot test it right now - need more functionality")
-        # FIXME(albartash): Implement this test
+        command = Shell.ls
+        non_existing_dir_name = "/nofolder_{:.0f}".format(time.time())
+        with self.assertRaises(ShellException):
+            command(non_existing_dir_name)
+
+        # NOTE(albartash): This test partially relies on "ls" output,
+        #                  but it's done as less as possible
+        error_output = command.errors
+        for part in ('ls', non_existing_dir_name, 'No such'):
+            self.assertIn(part, error_output)
 
     def test_dir_shell(self):
         """Check usage of dir(Shell)"""

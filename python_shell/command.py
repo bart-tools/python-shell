@@ -73,7 +73,8 @@ class Command(ICommand):
             Subprocess.run(
                 self._make_command_execution_list(
                     args, kwargs),
-                stdout=Subprocess.PIPE
+                stdout=Subprocess.PIPE,
+                stderr=Subprocess.PIPE
             )
         )
         if self._process.returncode:

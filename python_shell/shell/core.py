@@ -37,6 +37,12 @@ class __MetaShell(type):
     __own_fields__ = ('last_command',)
 
     def __getattr__(cls, item):
+        """Returns either own field or shell command object"""
+
+        # NOTE(albartash): The next check ensures we wouldn't have troubles
+        #                  in getting own fields even if forgetting to define
+        #                  a related property for that.
+
         if item in cls.__own_fields__:
             return cls.__dict__[item]
         else:
