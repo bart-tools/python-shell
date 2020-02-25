@@ -104,6 +104,10 @@ Supported environments:
 
 Other old versions of Python (e.g. 2.6, 3.4, etc) will never be supported. However, you always can implement such support in your forks.
 
+Test coverage is one of the top priority for this library:
+- Coverage using Python 2.7: 96%
+- Coverage using Python 3.x: 92%
+
 ## Authors
 
 * **Alex Sokolov** - *Author* - [Albartash](https://github.com/AlBartash)
