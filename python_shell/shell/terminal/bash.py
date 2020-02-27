@@ -22,7 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+from python_shell.shell.terminal.base import BaseTerminalIntegration
+from python_shell.util import Process
+from python_shell.util import Subprocess
 
 
-__all__ = ('Shell',)
+__all__ = ('BashTerminalIntegration',)
+
+
+class BashTerminalIntegration(BaseTerminalIntegration):
+    """Terminal integration for Bash"""
+
+    _shell_name = "bash"
+    _available_commands = None
+
+    def __init__(self):
+        super(BashTerminalIntegration, self).__init__()
+
+    def _get_available_commands(self):
+        """Reload available commands from shell"""
+        process = Process(
+            Subprocess.run(
+                [self._shell_name, '-c', 'compgen -c'],
+                stdout=Subprocess.PIPE,
+                stderr=Subprocess.DEVNULL()
+            )
+        )
+        return process.stdout.split()
+
+    @property
+    def available_commands(self):
+        """Returns list of available executable commands in the shell"""
+        if self._available_commands is None:
+            self._available_commands = self._get_available_commands()
+        return self._available_commands

@@ -22,7 +22,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+from python_shell.interfaces import ICommand
+from python_shell.shell.terminal.interfaces import ITerminalIntegration
 
 
-__all__ = ('Shell',)
+__all__ = ('FakeCommand', 'FakeTerminal')
+
+
+class FakeCommand(ICommand):
+    """Fake command for testing interfaces"""
+
+    def __init__(self):
+        pass
+
+    @property
+    def command(self):
+        return super(FakeCommand, self).command
+
+    @property
+    def arguments(self):
+        return super(FakeCommand, self).arguments
+
+    @property
+    def output(self):
+        return super(FakeCommand, self).output
+
+    @property
+    def errors(self):
+        return super(FakeCommand, self).errors
+
+    @property
+    def return_code(self):
+        return super(FakeCommand, self).return_code
+
+
+class FakeTerminal(ITerminalIntegration):
+    """Fake terminal for testing terminal integration interface"""
+
+    @property
+    def available_commands(self):
+        return super(FakeTerminal, self).available_commands
+
+    @property
+    def shell_name(self):
+        return super(FakeTerminal, self).available_commands

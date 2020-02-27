@@ -22,50 +22,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from io import open
+
 import itertools
-import os
-import subprocess
-import sys
 
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.interfaces import ICommand
+from python_shell.util import Process
+from python_shell.util import Subprocess
 
 
 __all__ = ('Command',)
 
 
-class Subprocess(object):
-    """A wrapper for subprocess module"""
-
-    @staticmethod
-    def run(*args, **kwargs):
-        """A simple wrapper for run() method of subprocess"""
-        if sys.version_info[0] == 3:
-            return subprocess.run(*args, **kwargs)
-        else:
-            if 'check' in kwargs:
-                kwargs.pop('check')
-            process = subprocess.Popen(*args, **kwargs)
-            stdout = process.communicate()[0]
-            process._stdout = stdout
-            return process
-
-    @staticmethod
-    def DEVNULL():
-        """A wrapper for DEVNULL which does not exist in Python 2"""
-
-        if sys.version_info[0] == 3:
-            return subprocess.DEVNULL
-        else:
-            return open(os.devnull, 'w')
-
-
 class Command(ICommand):
     """Simple decorator for shell commands"""
 
-    _arguments = None
+    _arguments = []
     _process = None
     _command = None
 
@@ -74,9 +47,7 @@ class Command(ICommand):
             Subprocess.run(("which", command_name),
                            check=True,
                            stdout=Subprocess.DEVNULL())
-        except subprocess.CalledProcessError:
-            raise CommandDoesNotExist(self)
-        except OSError:  # for Python 2
+        except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)
 
     @staticmethod
@@ -92,16 +63,20 @@ class Command(ICommand):
 
     def __init__(self, command_name):
         self._command = command_name
-        self._validate_command(command_name)
+        self._process = Process()
 
     def __call__(self, *args, **kwargs):
         """Executes the command with passed arguments
            and returns a Command instance"""
-
-        self._process = Subprocess.run(
-            self._make_command_execution_list(
-                args, kwargs),
-            stdout=subprocess.PIPE)
+        self._validate_command(self._command)
+        self._process = Process(
+            Subprocess.run(
+                self._make_command_execution_list(
+                    args, kwargs),
+                stdout=Subprocess.PIPE,
+                stderr=Subprocess.PIPE
+            )
+        )
         if self._process.returncode:
             raise ShellException(self)
         return self
@@ -124,7 +99,17 @@ class Command(ICommand):
     @property
     def output(self):
         """Returns a string output of the invoked command"""
-        if sys.version_info[0] == 3:
-            return self._process.stdout.decode()
-        else:
-            return self._process._stdout
+        return self._process.stdout
+
+    @property
+    def errors(self):
+        """Returns a string output of the invoked command from stderr """
+        return self._process.stderr
+
+    def __str__(self):
+        """Returns command's output as a string"""
+        return self.output
+
+    def __repr__(self):
+        """Returns command's execution string"""
+        return ' '.join((self.command, self.arguments))

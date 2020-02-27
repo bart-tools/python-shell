@@ -24,46 +24,46 @@ THE SOFTWARE.
 
 import unittest
 
-from python_shell.interfaces import ICommand
+from .fixtures.interfaces import FakeCommand
+from .fixtures.interfaces import FakeTerminal
 
 
-__all__ = ('CommandInterfaceTestCase',)
+__all__ = ('CommandInterfaceTestCase', 'TerminalInterfaceTestCase')
 
 
-class FakeCommand(ICommand):
-    """A tricky class for testing interfaces"""
-
-    def __init__(self):
-        pass
-
-    @property
-    def command(self):
-        return super(FakeCommand, self).command
-
-    @property
-    def arguments(self):
-        return super(FakeCommand, self).arguments
-
-    @property
-    def output(self):
-        return super(FakeCommand, self).output
-
-    @property
-    def return_code(self):
-        return super(FakeCommand, self).return_code
-
-
-class CommandInterfaceTestCase(unittest.TestCase):
-    """Test case for interfaces"""
+class BaseInterfaceTestCase(unittest.TestCase):
+    """Base test case for interfaces"""
+    implementation_class = None  # Interface fake implementation class
+    properties = ()  # List of properties to be checked
 
     @classmethod
     def setUpClass(cls):
-        super(CommandInterfaceTestCase, cls).setUpClass()
-        cls._command = FakeCommand()
+        """Initialize implementation"""
+        super(BaseInterfaceTestCase, cls).setUpClass()
+        cls._instance = cls.implementation_class()
 
-    def test_public_properties_are_abstract(self):
+    def _check_properties(self):
         """Check that all properties are abstract"""
-
-        for prop_name in ('output', 'arguments', 'command', 'return_code'):
+        for prop_name in self.properties:
             with self.assertRaises(NotImplementedError):
-                getattr(self._command, prop_name)
+                getattr(self._instance, prop_name)
+
+
+class CommandInterfaceTestCase(BaseInterfaceTestCase):
+    """Test case for Command interface"""
+
+    implementation_class = FakeCommand
+    properties = ('output', 'arguments', 'command', 'return_code', 'errors')
+
+    def test_command_interface(self):
+        self._check_properties()
+
+
+class TerminalInterfaceTestCase(BaseInterfaceTestCase):
+    """Test case for Terminal integration interface"""
+
+    implementation_class = FakeTerminal
+    properties = ('available_commands', 'shell_name')
+
+    def test_terminal_integration_interface(self):
+        self._check_properties()

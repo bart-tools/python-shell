@@ -22,7 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+import unittest
+
+from python_shell.shell import terminal
+
+__all__ = ('TerminalIntegrationTestCase',)
 
 
-__all__ = ('Shell',)
+class TerminalIntegrationTestCase(unittest.TestCase):
+    """Abstract Test case for terminal integration"""
+
+    def _test_terminal_available_commands(self, integration_class_name):
+        """Check available commands to be non-empty list"""
+        term = getattr(terminal, integration_class_name)()
+        self.assertLess(0, len(term.available_commands))
+
+
+class BashTerminalIntegrationTestCase(TerminalIntegrationTestCase):
+    """Test case for Bash terminal integration"""
+
+    def test_bash_available_commands(self):
+        """Check if Bash available commands can be retrieved"""
+        self._test_terminal_available_commands('BashTerminalIntegration')

@@ -28,13 +28,12 @@ import tempfile
 import time
 import unittest
 
+
 from python_shell.command import Command
 from python_shell.exceptions import CommandDoesNotExist
-from python_shell.exceptions import ShellException
-from python_shell.shell import Shell
 
 
-__all__ = ('CommandTestCase', 'ShellTestCase')
+__all__ = ('CommandTestCase',)
 
 
 class CommandTestCase(unittest.TestCase):
@@ -53,19 +52,8 @@ class CommandTestCase(unittest.TestCase):
         command(self.tmp_folder)
         self.assertEqual(command.return_code, 0)
 
-    def test_non_existing_command_python_2(self):
-        """Check when command does not exist in Python 2"""
-
-        if sys.version_info[0] != 2:
-            self.skipTest('Only for Python 2')
-        with self.assertRaises(OSError):
-            Command('random_{}'.format(time.time()))()
-
-    def test_non_existing_command_python_3(self):
-        """Check when command does not exist in Python 3"""
-
-        if sys.version_info[0] != 3:
-            self.skipTest('Only for Python 3')
+    def test_non_existing_command(self):
+        """Check when command does not exist"""
         with self.assertRaises(CommandDoesNotExist):
             Command('random_{}'.format(time.time()))()
 
@@ -75,12 +63,14 @@ class CommandTestCase(unittest.TestCase):
         command = Command('echo')(value)
         self.assertEqual(command.output, "{}\n".format(value))
 
+    def test_string_representation(self):
+        """Check command string representation"""
+        value = str(time.time())
+        command = Command('echo')(value)
+        self.assertEqual(str(command), value + '\n')
 
-class ShellTestCase(unittest.TestCase):
-    def test_shell_non_zero_return_code(self):
-        """Check the case when Shell command returns non-zero code"""
-        with self.assertRaises(ShellException) as context:
-            Shell.mkdir('/tmp')
-        self.assertEqual(str(context.exception),
-                         'Shell command "mkdir /tmp" failed '
-                         'with return code 1')
+    def test_command_base_representation(self):
+        """Check command general representation"""
+        args = ('-l', '-a', '/tmp')
+        command = Command('ls')(*args)
+        self.assertEqual(repr(command), ' '.join((command.command,) + args))

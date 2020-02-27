@@ -22,7 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+from .bash import *
 
 
-__all__ = ('Shell',)
+TERMINAL_INTEGRATION_MAP = {
+    'bash': BashTerminalIntegration
+}

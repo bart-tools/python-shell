@@ -21,11 +21,14 @@ Shell.ls('-l', '$HOME')  # Equals "ls -l $HOME"
 
 command = Shell.whoami()  # Equals "whoami"
 print(command.output)  # prints your current user name
+print(command)  # Does the same as above
 
 print(command.command)  # prints "whoami"
+print(repr(command))  # Does the same as above
+
+print(command.errors)  # prints text string from stderr
 print(command.return_code)  # prints "0"
 print(command.arguments)  # prints ""
-
 ```
 
 To run any Bash command, you need to do it like this:
@@ -38,6 +41,18 @@ For example, you want to create a new folder:
 Shell.mkdir('-p', '/tmp/new_folder')
 ```
 
+It's also possible to run a command which name is not a valid Python identifier.
+To do this, use Shell class as a callable instance:
+```python
+command = Shell('2to3')
+```
+
+When the command fails (returncode is non-zero), Shell throws a ShellException error.
+However, even if you didn't save a reference to your command, you still can access it.
+To do this, try
+```python
+last_cmd = Shell.last_command
+```
 ### Installing
 
 Simply run
@@ -46,6 +61,17 @@ Simply run
 pip install python-shell
 ```
 
+## Integration with development tools
+
+**Shell** class now allows to list all available commands simply by
+```python
+dir(Shell)
+```
+
+This feature enables autocomplete of commands in a few popular interfaces:
+- BPython
+- IPython
+ 
 ## Extending the basic functionality
 
 It's possible to extend the existing functionality without forking the project.
@@ -78,9 +104,17 @@ Supported environments:
 
 Other old versions of Python (e.g. 2.6, 3.4, etc) will never be supported. However, you always can implement such support in your forks.
 
+Test coverage is one of the top priority for this library:
+- Coverage using Python 2.7: 96%
+- Coverage using Python 3.x: 92%
+
 ## Authors
 
 * **Alex Sokolov** - *Author* - [Albartash](https://github.com/AlBartash)
+
+## Contacts
+
+* Telegram channel with updates: [@bart_tools](http://t.me/bart_tools)
 
 ## License
 

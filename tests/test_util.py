@@ -22,7 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+import sys
+import unittest
+
+from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
+from python_shell.util import is_python2_running
+from python_shell.util import get_current_terminal_name
 
 
-__all__ = ('Shell',)
+__all__ = ('UtilTestCase',)
+
+
+class UtilTestCase(unittest.TestCase):
+    """Test case for utils"""
+
+    def test_python_version_checker(self):
+        """Check if python version checker works properly"""
+        self.assertEqual(is_python2_running(), sys.version_info[0] == 2)
+
+    def test_get_current_terminal_name(self):
+        """Check that getting current terminal name works"""
+        self.assertIn(get_current_terminal_name(),
+                      TERMINAL_INTEGRATION_MAP.keys())

@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import sys
 import unittest
 
 from python_shell.command import Subprocess
@@ -34,21 +33,6 @@ __all__ = ('SubprocessTestCase',)
 class SubprocessTestCase(unittest.TestCase):
     """Test case for Subprocess wrapper"""
 
-    def test_run_python3(self):
-        """Check that run() works for python 3"""
-
-        if sys.version_info[0] != 3:
-            self.skipTest("Only for Python 3")
-        try:
-            Subprocess.run(['echo'])
-        except Exception as e:
-            self.fail(str(e))
-
-    def test_run_python2(self):
-        """Check that run() works for python 2"""
-
-        if sys.version_info[0] != 2:
-            self.skipTest("Only for Python 2")
-
-        extra_args = {'check': True}
-        Subprocess.run(['echo'], **extra_args)
+    def test_run_python(self):
+        """Check that run() works"""
+        Subprocess.run(['echo'], check=True)

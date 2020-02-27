@@ -22,7 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+import os
 
 
-__all__ = ('Shell',)
+__all__ = ('get_current_terminal_name',)
+
+
+def get_current_terminal_name():
+    """Retrieve name of currently active terminal
+
+    NOTE(albartash): Currently retrieves name using $SHELL variable which
+                     is not quite good. Also not sure if work on Windows.
+    TODO(albartash): Replace logic for better one to retrieve a proper
+                     terminal name
+    """
+    return os.environ['SHELL'].split('/')[-1]

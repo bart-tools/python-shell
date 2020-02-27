@@ -22,18 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from six import with_metaclass
-
-from python_shell.command import Command
+from sys import version_info
 
 
-__all__ = ('Shell',)
+__all__ = ('is_python2_running',)
 
 
-class __MetaShell(type):
-    def __getattribute__(cls, item):
-        return Command(item)
+def __get_python_version():
+    """Retrieve current Python X.Y version as (X, Y)"""
+    return version_info[0:2]
 
 
-class Shell(with_metaclass(__MetaShell)):
-    """Simple decorator for Terminal using Subprocess"""
+def is_python2_running():
+    """Check if current interpreter is Python 2.x"""
+    return __get_python_version()[0] == 2

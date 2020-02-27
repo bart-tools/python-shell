@@ -22,7 +22,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+import abc
+
+from .interfaces import ITerminalIntegration
 
 
-__all__ = ('Shell',)
+__all__ = ('BaseTerminalIntegration',)
+
+
+class BaseTerminalIntegration(ITerminalIntegration):
+    """Base class for terminal integrations"""
+
+    _shell_name = None  # Shell name, like 'bash', 'zsh', etc.
+
+    @property
+    def shell_name(self):
+        """Returns a name of shell used in this integration"""
+        return self._shell_name
+
+    @property
+    @abc.abstractmethod
+    def available_commands(self):
+        """Returns list of available executable commands in the shell"""
+        raise NotImplementedError
