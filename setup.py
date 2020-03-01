@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+from setuptools import find_packages
 from setuptools import setup
 from os import path
 import sys
@@ -37,7 +38,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='python-shell',
-    version='1.0.1',
+    version='1.0.2',
     description='Python Shell Wrapper library',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -56,7 +57,7 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     keywords='python shell bash',
-    packages=['python_shell'],
+    packages=find_packages(exclude=['tests']),
     python_requires='>2.7.*, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4',
     install_requires=['six>=1.14.0'],
     project_urls={
