@@ -26,7 +26,8 @@ from io import open
 import os
 import subprocess
 
-from .version import is_python2_running
+from python_shell.shell.processing.interfaces import IProcess
+from python_shell.util.version import is_python2_running
 
 
 __all__ = ('Subprocess', 'Process')
@@ -40,7 +41,7 @@ else:
     _CalledProcessError = subprocess.CalledProcessError
 
 
-class Process(object):
+class Process(IProcess):
     """A wrapper for process"""
 
     _process = None  # process instance
@@ -68,6 +69,17 @@ class Process(object):
     def returncode(self):
         """Returns returncode of process"""
         return self._process.returncode
+
+
+class SyncProcess(Process):
+    """Process subclass for running process
+    with waiting for its completion"""
+
+
+class AsyncProcess(Process):
+    """Process subclass for running process
+    without waiting for its completion"""
+    pass
 
 
 class Subprocess(object):

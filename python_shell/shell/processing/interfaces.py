@@ -22,14 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from python_shell.shell.processing.process import *
-from .terminal import *
-from .version import *
+import abc
+from six import with_metaclass
 
 
-__all__ = (
-    'is_python2_running',
-    'get_current_terminal_name',
-    'Subprocess',
-    'Process'
-)
+class IProcess(with_metaclass(abc.ABCMeta)):
+    """Interface for defining Process wrappers"""
+
+    @property
+    @abc.abstractmethod
+    def stderr(self):
+        """Returns stderr output of process"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def stdout(self):
+        """Returns stdout output of process"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def returncode(self):
+        """Returns returncode of process"""
+        raise NotImplementedError

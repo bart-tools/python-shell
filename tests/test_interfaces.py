@@ -24,8 +24,7 @@ THE SOFTWARE.
 
 import unittest
 
-from .fixtures.interfaces import FakeCommand
-from .fixtures.interfaces import FakeTerminal
+from .fixtures import interfaces
 
 
 __all__ = ('CommandInterfaceTestCase', 'TerminalInterfaceTestCase')
@@ -52,7 +51,7 @@ class BaseInterfaceTestCase(unittest.TestCase):
 class CommandInterfaceTestCase(BaseInterfaceTestCase):
     """Test case for Command interface"""
 
-    implementation_class = FakeCommand
+    implementation_class = interfaces.FakeCommand
     properties = ('output', 'arguments', 'command', 'return_code', 'errors')
 
     def test_command_interface(self):
@@ -62,8 +61,15 @@ class CommandInterfaceTestCase(BaseInterfaceTestCase):
 class TerminalInterfaceTestCase(BaseInterfaceTestCase):
     """Test case for Terminal integration interface"""
 
-    implementation_class = FakeTerminal
+    implementation_class = interfaces.FakeTerminal
     properties = ('available_commands', 'shell_name')
 
     def test_terminal_integration_interface(self):
         self._check_properties()
+
+
+class ProcessInterfaceTestCase(BaseInterfaceTestCase):
+    """Test case for Process interface"""
+
+    implementation_class = interfaces.FakeProcess
+    properties = ('stderr', 'stdout', 'returncode')
