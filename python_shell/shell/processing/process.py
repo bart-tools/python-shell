@@ -25,12 +25,13 @@ THE SOFTWARE.
 from io import open
 import os
 import subprocess
+# from typing import Text, Union
 
 from python_shell.shell.processing.interfaces import IProcess
 from python_shell.util.version import is_python2_running
 
 
-__all__ = ('Subprocess', 'Process')
+__all__ = ('Subprocess', 'Process', 'SyncProcess', 'AsyncProcess')
 
 
 _PIPE = subprocess.PIPE
@@ -42,7 +43,12 @@ else:
 
 
 class Process(IProcess):
-    """A wrapper for process"""
+    """A wrapper for process
+
+    When process is not initialized (passed process=None to constructor),
+    it is generally undefined, so neither completed nor running,
+    but for practical reason, assume it has never been started.
+    """
 
     _process = None  # process instance
 
@@ -50,25 +56,46 @@ class Process(IProcess):
         self._process = process
 
     @property
-    def stderr(self):
-        """Returns stderr output of process"""
+    def stderr(self):  # -> Text
+        """Returns stderr output of process
+
+        For undefined process, it returns empty string.
+        """
         if is_python2_running():
             return self._process._stderr if self._process else ""
         return self._process.stderr.decode() \
             if self._process and self._process.stderr else ""
 
     @property
-    def stdout(self):
-        """Returns stdout output of process"""
+    def stdout(self):  # -> Text
+        """Returns stdout output of process
+
+        For undefined process, it returns empty string.
+        """
         if is_python2_running():
             return self._process._stdout if self._process else ""
         return self._process.stdout.decode() \
             if self._process and self._process.stdout else ""
 
     @property
-    def returncode(self):
-        """Returns returncode of process"""
-        return self._process.returncode
+    def returncode(self):  # -> Union[int, None]
+        """Returns returncode of process
+
+        For undefined process, it returns None
+        """
+        if self._process:
+            return self._process.returncode
+        return None
+
+    @property
+    def is_finished(self):  # -> Union[bool, None]
+        """Returns whether process has been completed
+
+        For undefined process, it returns None.
+        """
+        if self._process:
+            return self._process.returncode is not None
+        return None
 
 
 class SyncProcess(Process):
@@ -79,7 +106,9 @@ class SyncProcess(Process):
 class AsyncProcess(Process):
     """Process subclass for running process
     without waiting for its completion"""
-    pass
+
+    def __init__(self):
+        raise NotImplementedError
 
 
 class Subprocess(object):
@@ -89,7 +118,7 @@ class Subprocess(object):
     PIPE = _PIPE
 
     @staticmethod
-    def run(*args, **kwargs):
+    def run(*args, **kwargs):  # -> process
         """A simple wrapper for run() method of subprocess"""
         if is_python2_running():
             check = False
@@ -104,7 +133,7 @@ class Subprocess(object):
             return subprocess.run(*args, **kwargs)
 
     @classmethod
-    def DEVNULL(cls):
+    def DEVNULL(cls):  # -> Union[subprocess.DEVNULL, _io.TextIOWrapper]
         """A wrapper for DEVNULL which does not exist in Python 2"""
         if is_python2_running():
             return open(os.devnull, 'w')

@@ -83,3 +83,7 @@ class FakeProcess(IProcess):
     @property
     def returncode(self):
         return super(FakeProcess, self).returncode
+
+    @property
+    def is_finished(self):
+        return super(FakeProcess, self).is_finished

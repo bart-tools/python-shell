@@ -31,5 +31,7 @@ __all__ = (
     'is_python2_running',
     'get_current_terminal_name',
     'Subprocess',
-    'Process'
+    'Process',
+    'SyncProcess',
+    'AsyncProcess'
 )

@@ -23,6 +23,8 @@ THE SOFTWARE.
 """
 
 import unittest
+from python_shell.shell.processing.process import SyncProcess
+from python_shell.shell.processing.process import Subprocess
 
 
 class ProcessTestCase(unittest.TestCase):
@@ -31,6 +33,38 @@ class ProcessTestCase(unittest.TestCase):
 
 class SyncProcessTestCase(unittest.TestCase):
     """Test case for synchronous process wrapper"""
+
+    def _test_sync_process_is_finished(self):
+        sync_process_args = ['echo', 'Hello']
+        sync_process_kwargs = {
+            'stdout': Subprocess.DEVNULL(),
+            'stderr': Subprocess.DEVNULL()
+        }
+        process = SyncProcess(Subprocess.run(sync_process_args,
+                                             **sync_process_kwargs))
+        self.assertIsNotNone(process.returncode)
+        self.assertTrue(process.is_finished)
+
+    def _test_sync_process_not_initialized(self):
+        """Check process which was not initialized"""
+        process = SyncProcess()
+        self.assertIsNone(process.is_finished)
+
+    def test_sync_process_property_is_finished(self):
+        """Check that is_finished works well for SyncProcess"""
+        self._test_sync_process_is_finished()
+        # TODO(albartash): Check for not finished process is TBD:
+        #                  It needs a proper implementation,
+        #                  as SyncProcess blocks main thread.
+        self._test_sync_process_not_initialized()
+
+    def test_sync_process_termination(self):
+        """Check that SyncProcess can be terminated properly"""
+        self.skipTest("TODO")
+
+    def test_sync_process_completion(self):
+        """Check that SyncProcess can be completed properly"""
+        self.skipTest("TODO")
 
 
 class AsyncProcessTestCase(unittest.TestCase):

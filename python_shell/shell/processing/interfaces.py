@@ -46,3 +46,9 @@ class IProcess(with_metaclass(abc.ABCMeta)):
     def returncode(self):
         """Returns returncode of process"""
         raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def is_finished(self):
+        """Returns whether process has been completed"""
+        raise NotImplementedError

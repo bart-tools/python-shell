@@ -72,4 +72,4 @@ class ProcessInterfaceTestCase(BaseInterfaceTestCase):
     """Test case for Process interface"""
 
     implementation_class = interfaces.FakeProcess
-    properties = ('stderr', 'stdout', 'returncode')
+    properties = ('stderr', 'stdout', 'returncode', 'is_finished')
