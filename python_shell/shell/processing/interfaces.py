@@ -52,3 +52,9 @@ class IProcess(with_metaclass(abc.ABCMeta)):
     def is_finished(self):
         """Returns whether process has been completed"""
         raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def execute(self):
+        """Run the process instance"""
+        raise NotImplementedError

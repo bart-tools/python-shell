@@ -23,6 +23,7 @@ THE SOFTWARE.
 """
 
 from io import open
+import itertools
 import os
 import subprocess
 # from typing import Text, Union
@@ -37,7 +38,22 @@ __all__ = ('Subprocess', 'Process', 'SyncProcess', 'AsyncProcess')
 _PIPE = subprocess.PIPE
 
 if is_python2_running():
-    _CalledProcessError = OSError
+    class _CalledProcessError(OSError):
+        """A wraooer for Python 2 exceptions.
+
+        Code is taken from CalledProcessError of Python 3 and adopted.
+        """
+
+        def __init__(self, returncode, cmd, output=None, stderr=None):
+            self.returncode = returncode
+            self.cmd = cmd
+            self.stdout = output
+            self.stderr = stderr
+
+        def __str__(self):
+            return "Command '%s' returned non-zero exit status %d." % (
+                self.cmd, self.returncode)
+
 else:
     _CalledProcessError = subprocess.CalledProcessError
 
@@ -51,9 +67,13 @@ class Process(IProcess):
     """
 
     _process = None  # process instance
+    _args = None
+    _kwargs = None
 
-    def __init__(self, process=None):
-        self._process = process
+    def __init__(self, command, *args, **kwargs):
+        self._command = command
+        self._args = args
+        self._kwargs = kwargs
 
     @property
     def stderr(self):  # -> Text
@@ -97,10 +117,50 @@ class Process(IProcess):
             return self._process.returncode is not None
         return None
 
+    def _make_command_execution_list(self, args):
+        """Builds and returns a Shell command"""
+
+        return [self._command] + list(map(str, args))
+
 
 class SyncProcess(Process):
     """Process subclass for running process
     with waiting for its completion"""
+
+    def execute(self):
+        """Run a process in synchronous way"""
+
+        arguments = self._make_command_execution_list(self._args)
+
+        stdout = self._kwargs.get('stdout', Subprocess.PIPE)
+        stderr = self._kwargs.get('stderr', Subprocess.PIPE)
+        stdin = self._kwargs.get('stdin', Subprocess.PIPE)
+
+        if is_python2_running():
+            self._process = subprocess.Popen(
+                arguments,
+                stdout=stdout,
+                stderr=stderr,
+                stdin=stdin
+            )
+
+            stdout, stderr = self._process.communicate()
+
+            self._process._stdout = stdout
+            self._process._stderr = stderr
+        else:
+            self._process = subprocess.run(
+                arguments,
+                stdin=stdin,
+                stdout=stdout,
+                stderr=stderr,
+                check=False
+            )
+        if self._process.returncode and self._kwargs.get('check', True):
+            raise Subprocess.CalledProcessError(
+                returncode=self._process.returncode,
+                cmd=str(arguments)
+            )
 
 
 class AsyncProcess(Process):
@@ -116,21 +176,6 @@ class Subprocess(object):
 
     CalledProcessError = _CalledProcessError
     PIPE = _PIPE
-
-    @staticmethod
-    def run(*args, **kwargs):  # -> process
-        """A simple wrapper for run() method of subprocess"""
-        if is_python2_running():
-            check = False
-            if 'check' in kwargs:
-                check = kwargs.pop('check')
-            process = subprocess.Popen(*args, **kwargs)
-            process._stdout, process._stderr = process.communicate()
-            if process.returncode and check:
-                raise Subprocess.CalledProcessError
-            return process
-        else:
-            return subprocess.run(*args, **kwargs)
 
     @classmethod
     def DEVNULL(cls):  # -> Union[subprocess.DEVNULL, _io.TextIOWrapper]

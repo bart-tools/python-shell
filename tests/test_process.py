@@ -40,14 +40,15 @@ class SyncProcessTestCase(unittest.TestCase):
             'stdout': Subprocess.DEVNULL(),
             'stderr': Subprocess.DEVNULL()
         }
-        process = SyncProcess(Subprocess.run(sync_process_args,
-                                             **sync_process_kwargs))
+        process = SyncProcess(*sync_process_args,
+                              **sync_process_kwargs)
+        process.execute()
         self.assertIsNotNone(process.returncode)
         self.assertTrue(process.is_finished)
 
     def _test_sync_process_not_initialized(self):
         """Check process which was not initialized"""
-        process = SyncProcess()
+        process = SyncProcess(['ls'])
         self.assertIsNone(process.is_finished)
 
     def test_sync_process_property_is_finished(self):
@@ -69,3 +70,4 @@ class SyncProcessTestCase(unittest.TestCase):
 
 class AsyncProcessTestCase(unittest.TestCase):
     """Test case for asynchronous process wrapper"""
+
