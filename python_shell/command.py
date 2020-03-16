@@ -43,7 +43,7 @@ class Command(ICommand):
         try:
             SyncProcess("which", command_name,
                         check=True,
-                        stdout=Subprocess.DEVNULL()
+                        stdout=Subprocess.DEVNULL
                         ).execute()
         except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)

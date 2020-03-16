@@ -44,7 +44,7 @@ class BashTerminalIntegration(BaseTerminalIntegration):
         process = SyncProcess(
                 self._shell_name, '-c', 'compgen -c',
                 stdout=Subprocess.PIPE,
-                stderr=Subprocess.DEVNULL(),
+                stderr=Subprocess.DEVNULL,
                 check=True
             )
         process.execute()

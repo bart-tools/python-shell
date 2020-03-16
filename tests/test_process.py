@@ -37,8 +37,8 @@ class SyncProcessTestCase(unittest.TestCase):
     def _test_sync_process_is_finished(self):
         sync_process_args = ['echo', 'Hello']
         sync_process_kwargs = {
-            'stdout': Subprocess.DEVNULL(),
-            'stderr': Subprocess.DEVNULL()
+            'stdout': Subprocess.DEVNULL,
+            'stderr': Subprocess.DEVNULL
         }
         process = SyncProcess(*sync_process_args,
                               **sync_process_kwargs)

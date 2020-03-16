@@ -28,6 +28,8 @@ import os
 import subprocess
 # from typing import Text, Union
 
+from six import with_metaclass
+
 from python_shell.shell.processing.interfaces import IProcess
 from python_shell.util.version import is_python2_running
 
@@ -171,16 +173,20 @@ class AsyncProcess(Process):
         raise NotImplementedError
 
 
-class Subprocess(object):
-    """A wrapper for subprocess module"""
+class _SubprocessMeta(type):
+    """Meta class for Subprocess"""
 
-    CalledProcessError = _CalledProcessError
-    PIPE = _PIPE
-
-    @classmethod
+    @property
     def DEVNULL(cls):  # -> Union[subprocess.DEVNULL, _io.TextIOWrapper]
         """A wrapper for DEVNULL which does not exist in Python 2"""
         if is_python2_running():
             return open(os.devnull, 'w')
         else:
             return subprocess.DEVNULL
+
+
+class Subprocess(with_metaclass(_SubprocessMeta, object)):
+    """A wrapper for subprocess module"""
+
+    CalledProcessError = _CalledProcessError
+    PIPE = _PIPE
