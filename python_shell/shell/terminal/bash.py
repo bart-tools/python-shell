@@ -25,6 +25,7 @@ THE SOFTWARE.
 from python_shell.shell.terminal.base import BaseTerminalIntegration
 from python_shell.util import SyncProcess
 from python_shell.util import Subprocess
+from python_shell.util.streaming import decode_stream
 
 
 __all__ = ('BashTerminalIntegration',)
@@ -48,7 +49,7 @@ class BashTerminalIntegration(BaseTerminalIntegration):
                 check=True
             )
         process.execute()
-        return process.stdout.split()
+        return decode_stream(process.stdout).split()
 
     @property
     def available_commands(self):

@@ -93,17 +93,17 @@ class Command(ICommand):
 
     @property
     def output(self):
-        """Returns a string output of the invoked command"""
+        """Returns a generator with output of the command"""
         return self._process.stdout
 
     @property
     def errors(self):
-        """Returns a string output of the invoked command from stderr """
+        """Returns a generator with output of the command from stderr """
         return self._process.stderr
 
     def __str__(self):
-        """Returns command's output as a string"""
-        return self.output
+        """Returns command's execution string"""
+        return repr(self)
 
     def __repr__(self):
         """Returns command's execution string"""

@@ -22,36 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-__all__ = ('CommandDoesNotExist', 'ShellException')
+__all__ = ('decode_stream',)
 
 
-class ShellException(Exception):
-    """Defines any exception caused by commands run in Shell"""
+def decode_stream(stream):
+    """Decodes stream and returns as a single string"""
 
-    _command = None
-
-    def __init__(self, command):
-        super(ShellException, self).__init__()
-        self._command = command
-
-    def __str__(self):
-        return 'Shell command "{} {}" failed with return code {}'.format(
-            self._command.command,
-            self._command.arguments,
-            self._command.return_code)
-
-
-class CommandDoesNotExist(ShellException):
-    """Defines an exception when command does not exist in the environment"""
-    def __init__(self, command):
-        super(CommandDoesNotExist, self).__init__(command)
-
-    def __str__(self):
-        return 'Command "{}" does not exist'.format(self._command.command)
-
-
-class UndefinedProcess(Exception):
-    """Raises when there's a try to use undefined process"""
-
-    def __str__(self):
-        return "Undefined process cannot be used"
+    return ''.join(map(lambda s: s.decode(), stream))

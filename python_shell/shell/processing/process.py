@@ -22,14 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from io import open
-import itertools
 import os
 import subprocess
 # from typing import Text, Union
 
 from six import with_metaclass
 
+from python_shell.exceptions import UndefinedProcess
 from python_shell.shell.processing.interfaces import IProcess
 from python_shell.util.version import is_python2_running
 
@@ -41,7 +40,7 @@ _PIPE = subprocess.PIPE
 
 if is_python2_running():
     class _CalledProcessError(OSError):
-        """A wraooer for Python 2 exceptions.
+        """A wrapper for Python 2 exceptions.
 
         Code is taken from CalledProcessError of Python 3 and adopted.
         """
@@ -58,6 +57,35 @@ if is_python2_running():
 
 else:
     _CalledProcessError = subprocess.CalledProcessError
+
+
+class StreamIterator(object):
+    """A wrapper for retrieving data from subprocess streams"""
+
+    def __init__(self, stream = None):
+        """Initialize object with passed stream.
+
+        If stream is None, that means process is undefined,
+        and iterator will just raise StopIteration.
+        """
+
+        self._stream = stream
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        """Returns next available line from passed stream"""
+
+        if not self._stream:
+            raise StopIteration
+
+        line = self._stream.readline()
+        if line:
+            return line
+        raise StopIteration
+
+    next = __next__
 
 
 class Process(IProcess):
@@ -78,26 +106,20 @@ class Process(IProcess):
         self._kwargs = kwargs
 
     @property
-    def stderr(self):  # -> Text
-        """Returns stderr output of process
+    def stderr(self):
+        """Returns stderr output of process"""
 
-        For undefined process, it returns empty string.
-        """
-        if is_python2_running():
-            return self._process._stderr if self._process else ""
-        return self._process.stderr.decode() \
-            if self._process and self._process.stderr else ""
+        return StreamIterator(
+            stream=self._process and self._process.stderr or None
+        )
 
     @property
-    def stdout(self):  # -> Text
-        """Returns stdout output of process
+    def stdout(self):
+        """Returns stdout output of process"""
 
-        For undefined process, it returns empty string.
-        """
-        if is_python2_running():
-            return self._process._stdout if self._process else ""
-        return self._process.stdout.decode() \
-            if self._process and self._process.stdout else ""
+        return StreamIterator(
+            stream=self._process and self._process.stdout or None
+        )
 
     @property
     def returncode(self):  # -> Union[int, None]
@@ -105,7 +127,9 @@ class Process(IProcess):
 
         For undefined process, it returns None
         """
+
         if self._process:
+            self._process.poll()  # Ensure we can get the returncode
             return self._process.returncode
         return None
 
@@ -124,6 +148,26 @@ class Process(IProcess):
 
         return [self._command] + list(map(str, args))
 
+    def terminate(self):
+        """Terminates process if it's defined"""
+
+        if self._process:
+            self._process.terminate()
+
+            # NOTE(albartash): It's needed, otherwise termination can happen slower
+            #                  than next call of poll().
+            self._process.wait()
+        else:
+            raise UndefinedProcess
+
+    def wait(self):
+        """Wait until process is completed"""
+
+        if self._process:
+            self._process.wait()
+        else:
+            raise UndefinedProcess
+
 
 class SyncProcess(Process):
     """Process subclass for running process
@@ -138,26 +182,18 @@ class SyncProcess(Process):
         stderr = self._kwargs.get('stderr', Subprocess.PIPE)
         stdin = self._kwargs.get('stdin', Subprocess.PIPE)
 
-        if is_python2_running():
-            self._process = subprocess.Popen(
-                arguments,
-                stdout=stdout,
-                stderr=stderr,
-                stdin=stdin
-            )
+        self._process = subprocess.Popen(
+            arguments,
+            stdout=stdout,
+            stderr=stderr,
+            stdin=stdin
+        )
 
-            stdout, stderr = self._process.communicate()
-
-            self._process._stdout = stdout
-            self._process._stderr = stderr
+        if is_python2_running():  # Timeout is not supported in Python 2
+            self._process.wait()
         else:
-            self._process = subprocess.run(
-                arguments,
-                stdin=stdin,
-                stdout=stdout,
-                stderr=stderr,
-                check=False
-            )
+            self._process.wait(timeout=self._kwargs.get('timeout', None))
+
         if self._process.returncode and self._kwargs.get('check', True):
             raise Subprocess.CalledProcessError(
                 returncode=self._process.returncode,
@@ -167,22 +203,45 @@ class SyncProcess(Process):
 
 class AsyncProcess(Process):
     """Process subclass for running process
-    without waiting for its completion"""
+    with waiting for its completion"""
 
-    def __init__(self):
-        raise NotImplementedError
+    def execute(self):
+        """Run a process in asynchronous way"""
+
+        arguments = self._make_command_execution_list(self._args)
+
+        stdout = self._kwargs.get('stdout', Subprocess.PIPE)
+        stderr = self._kwargs.get('stderr', Subprocess.PIPE)
+        stdin = self._kwargs.get('stdin', Subprocess.PIPE)
+
+        self._process = subprocess.Popen(
+            arguments,
+            stdout=stdout,
+            stderr=stderr,
+            stdin=stdin
+        )
+
+        if is_python2_running():
+            self._process._stdout = stdout
+            self._process._stderr = stderr
 
 
 class _SubprocessMeta(type):
     """Meta class for Subprocess"""
 
+    _devnull = None
+
     @property
-    def DEVNULL(cls):  # -> Union[subprocess.DEVNULL, _io.TextIOWrapper]
-        """A wrapper for DEVNULL which does not exist in Python 2"""
+    def DEVNULL(cls):  # -> int
+        """Returns a DEVNULL constant compatible with all Pytho versions"""
+
         if is_python2_running():
-            return open(os.devnull, 'w')
+            if cls._devnull is None:
+                cls._devnull = os.open(os.devnull, os.O_RDWR)
         else:
-            return subprocess.DEVNULL
+            cls._devnull = subprocess.DEVNULL
+
+        return cls._devnull
 
 
 class Subprocess(with_metaclass(_SubprocessMeta, object)):

@@ -22,9 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import time
 import unittest
+
+from python_shell.shell.processing.process import AsyncProcess
 from python_shell.shell.processing.process import SyncProcess
 from python_shell.shell.processing.process import Subprocess
+from python_shell.util.streaming import decode_stream
 
 
 class ProcessTestCase(unittest.TestCase):
@@ -45,6 +49,7 @@ class SyncProcessTestCase(unittest.TestCase):
         process.execute()
         self.assertIsNotNone(process.returncode)
         self.assertTrue(process.is_finished)
+
 
     def _test_sync_process_not_initialized(self):
         """Check process which was not initialized"""
@@ -71,3 +76,67 @@ class SyncProcessTestCase(unittest.TestCase):
 class AsyncProcessTestCase(unittest.TestCase):
     """Test case for asynchronous process wrapper"""
 
+    processes = []
+
+    @classmethod
+    def tearDownClass(cls):
+        """Cleanup processes"""
+        for p in cls.processes:
+            try:
+                p._process.terminate()
+            except OSError:
+                pass
+            p._process.stderr.close()
+            p._process.stdout.close()
+
+    def test_async_process_is_finished(self):
+        timeout = 0.1  # seconds
+        process = AsyncProcess('sleep', str(timeout))
+        self.processes.append(process)
+        process.execute()
+        self.assertIsNone(process.returncode)
+        time.sleep(timeout + 1)  # ensure command finishes
+        self.assertEqual(process.returncode, 0)
+
+    def test_async_process_is_not_initialized(self):
+        """Check that async process is not initialized when not finished"""
+        timeout = 0.5  # seconds
+        process = AsyncProcess('sleep', str(timeout))
+        self.processes.append(process)
+        process.execute()
+        self.assertIsNone(process.returncode)
+        time.sleep(timeout + 0.5)
+        self.assertIsNotNone(process.returncode)
+
+    def test_async_std_properties_accessible(self):
+        """Check if standard properties are accessible for AsyncProcess"""
+
+        timeout = 0.5  # seconds
+        process = AsyncProcess('sleep', str(timeout))
+        self.processes.append(process)
+        process.execute()
+        stdout = decode_stream(process.stdout)
+        stderr = decode_stream(process.stderr)
+
+        self.assertEqual(stdout, "")
+        self.assertEqual(stderr, "")
+
+    def test_async_process_property_is_finished(self):
+        self.skipTest("TODO")
+
+    def test_async_process_termination(self):
+        """Check that AsyncProcess can be terminated properly"""
+
+        process = AsyncProcess('yes')
+        process.execute()
+        process.terminate()
+        self.assertEqual(process.returncode, -15)
+
+    def test_async_process_completion(self):
+        """Check that AsyncProcess can be completed properly"""
+
+        timeout = str(0.5)
+        process = AsyncProcess('sleep', timeout)
+        process.execute()
+        process.wait()
+        self.assertEqual(process.returncode, 0)
