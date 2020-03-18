@@ -31,10 +31,6 @@ from python_shell.shell.processing.process import Subprocess
 from python_shell.util.streaming import decode_stream
 
 
-class ProcessTestCase(unittest.TestCase):
-    """Test case for base process wrapper"""
-
-
 class SyncProcessTestCase(unittest.TestCase):
     """Test case for synchronous process wrapper"""
 
@@ -130,6 +126,8 @@ class AsyncProcessTestCase(unittest.TestCase):
         process = AsyncProcess('yes')
         process.execute()
         process.terminate()
+
+        self.assertTrue(process.is_terminated)
         self.assertEqual(process.returncode, -15)
 
     def test_async_process_completion(self):
@@ -139,4 +137,5 @@ class AsyncProcessTestCase(unittest.TestCase):
         process = AsyncProcess('sleep', timeout)
         process.execute()
         process.wait()
+        self.assertTrue(process.is_finished)
         self.assertEqual(process.returncode, 0)

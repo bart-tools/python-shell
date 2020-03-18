@@ -100,6 +100,8 @@ class Process(IProcess):
     _args = None
     _kwargs = None
 
+    PROCESS_IS_TERMINATED_CODE = -15
+
     def __init__(self, command, *args, **kwargs):
         self._command = command
         self._args = args
@@ -141,6 +143,17 @@ class Process(IProcess):
         """
         if self._process:
             return self._process.returncode is not None
+        return None
+
+    @property
+    def is_terminated(self):  # -> Union[bool, None]
+        """Returns whether process has been terminated
+
+        For undefined process, it returns None.
+        """
+
+        if self._process:
+            return self.returncode == self.PROCESS_IS_TERMINATED_CODE
         return None
 
     def _make_command_execution_list(self, args):
