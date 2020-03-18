@@ -93,12 +93,12 @@ class Command(ICommand):
 
     @property
     def output(self):
-        """Returns a generator with output of the command"""
+        """Returns an iterable object with output of the command"""
         return self._process.stdout
 
     @property
     def errors(self):
-        """Returns a generator with output of the command from stderr """
+        """Returns an iterable object with output of the command from stderr """
         return self._process.stderr
 
     def __str__(self):
