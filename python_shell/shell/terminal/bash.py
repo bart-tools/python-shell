@@ -23,8 +23,9 @@ THE SOFTWARE.
 """
 
 from python_shell.shell.terminal.base import BaseTerminalIntegration
-from python_shell.util import Process
+from python_shell.util import SyncProcess
 from python_shell.util import Subprocess
+from python_shell.util.streaming import decode_stream
 
 
 __all__ = ('BashTerminalIntegration',)
@@ -41,14 +42,14 @@ class BashTerminalIntegration(BaseTerminalIntegration):
 
     def _get_available_commands(self):
         """Reload available commands from shell"""
-        process = Process(
-            Subprocess.run(
-                [self._shell_name, '-c', 'compgen -c'],
+        process = SyncProcess(
+                self._shell_name, '-c', 'compgen -c',
                 stdout=Subprocess.PIPE,
-                stderr=Subprocess.DEVNULL()
+                stderr=Subprocess.DEVNULL,
+                check=True
             )
-        )
-        return process.stdout.split()
+        process.execute()
+        return decode_stream(process.stdout).split()
 
     @property
     def available_commands(self):

@@ -23,14 +23,13 @@ THE SOFTWARE.
 """
 
 import os
-import sys
 import tempfile
 import time
 import unittest
 
-
 from python_shell.command import Command
 from python_shell.exceptions import CommandDoesNotExist
+from python_shell.util.streaming import decode_stream
 
 
 __all__ = ('CommandTestCase',)
@@ -61,13 +60,15 @@ class CommandTestCase(unittest.TestCase):
         """Check command output property"""
         value = str(time.time())
         command = Command('echo')(value)
-        self.assertEqual(command.output, "{}\n".format(value))
+        output = decode_stream(command.output)
+        self.assertEqual(output, "{}\n".format(value))
 
     def test_string_representation(self):
         """Check command string representation"""
         value = str(time.time())
-        command = Command('echo')(value)
-        self.assertEqual(str(command), value + '\n')
+        cmd = 'echo'
+        command = Command(cmd)(value)
+        self.assertEqual(str(command), "{} {}".format(cmd, value))
 
     def test_command_base_representation(self):
         """Check command general representation"""

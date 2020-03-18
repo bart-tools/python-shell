@@ -23,10 +23,11 @@ THE SOFTWARE.
 """
 
 from python_shell.interfaces import ICommand
+from python_shell.shell.processing.interfaces import IProcess
 from python_shell.shell.terminal.interfaces import ITerminalIntegration
 
 
-__all__ = ('FakeCommand', 'FakeTerminal')
+__all__ = ('FakeCommand', 'FakeProcess', 'FakeTerminal')
 
 
 class FakeCommand(ICommand):
@@ -66,3 +67,23 @@ class FakeTerminal(ITerminalIntegration):
     @property
     def shell_name(self):
         return super(FakeTerminal, self).available_commands
+
+
+class FakeProcess(IProcess):
+    """Fake process for testing process interface"""
+
+    @property
+    def stderr(self):
+        return super(FakeProcess, self).stderr
+
+    @property
+    def stdout(self):
+        return super(FakeProcess, self).stdout
+
+    @property
+    def returncode(self):
+        return super(FakeProcess, self).returncode
+
+    @property
+    def is_finished(self):
+        return super(FakeProcess, self).is_finished

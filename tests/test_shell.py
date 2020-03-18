@@ -30,6 +30,7 @@ from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
 from python_shell.shell import Shell
 from python_shell.shell.terminal import TERMINAL_INTEGRATION_MAP
+from python_shell.util.streaming import decode_stream
 from python_shell.util.terminal import get_current_terminal_name
 
 
@@ -68,7 +69,7 @@ class ShellTestCase(unittest.TestCase):
 
         # NOTE(albartash): This test partially relies on "ls" output,
         #                  but it's done as less as possible
-        error_output = command.errors
+        error_output = decode_stream(command.errors)
         for part in ('ls', non_existing_dir_name, 'No such'):
             self.assertIn(part, error_output)
 

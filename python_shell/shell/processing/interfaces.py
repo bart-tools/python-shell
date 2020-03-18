@@ -22,17 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import unittest
-
-from python_shell.command import Subprocess
-
-
-__all__ = ('SubprocessTestCase',)
+import abc
+from six import with_metaclass
 
 
-class SubprocessTestCase(unittest.TestCase):
-    """Test case for Subprocess wrapper"""
+class IProcess(with_metaclass(abc.ABCMeta)):
+    """Interface for defining Process wrappers"""
 
-    def test_run_python(self):
-        """Check that run() works"""
-        Subprocess.run(['echo'], check=True)
+    @property
+    @abc.abstractmethod
+    def stderr(self):
+        """Returns stderr output of process"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def stdout(self):
+        """Returns stdout output of process"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def returncode(self):
+        """Returns returncode of process"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def is_finished(self):
+        """Returns whether process has been completed"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def execute(self):
+        """Run the process instance"""
+        raise NotImplementedError
