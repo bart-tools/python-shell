@@ -28,6 +28,8 @@ import subprocess
 
 from six import with_metaclass
 
+from python_shell.exceptions import POPEN_EXCEPTIONS
+from python_shell.exceptions import RunProcessError
 from python_shell.exceptions import UndefinedProcess
 from python_shell.shell.processing.interfaces import IProcess
 from python_shell.util.version import is_python2_running
@@ -191,16 +193,23 @@ class SyncProcess(Process):
 
         arguments = self._make_command_execution_list(self._args)
 
-        stdout = self._kwargs.get('stdout', Subprocess.PIPE)
-        stderr = self._kwargs.get('stderr', Subprocess.PIPE)
-        stdin = self._kwargs.get('stdin', Subprocess.PIPE)
+        kwargs = {
+            'stdout': self._kwargs.get('stdout', Subprocess.PIPE),
+            'stderr': self._kwargs.get('stderr', Subprocess.PIPE),
+            'stdin': self._kwargs.get('stdin', Subprocess.PIPE)
+        }
 
-        self._process = subprocess.Popen(
-            arguments,
-            stdout=stdout,
-            stderr=stderr,
-            stdin=stdin
-        )
+        try:
+            self._process = subprocess.Popen(
+                arguments,
+                **kwargs
+            )
+        except POPEN_EXCEPTIONS:
+            raise RunProcessError(
+                cmd=arguments[0],
+                process_args=arguments[1:],
+                process_kwargs=kwargs
+            )
 
         if is_python2_running():  # Timeout is not supported in Python 2
             self._process.wait()
@@ -223,20 +232,23 @@ class AsyncProcess(Process):
 
         arguments = self._make_command_execution_list(self._args)
 
-        stdout = self._kwargs.get('stdout', Subprocess.PIPE)
-        stderr = self._kwargs.get('stderr', Subprocess.PIPE)
-        stdin = self._kwargs.get('stdin', Subprocess.PIPE)
+        kwargs = {
+            'stdout': self._kwargs.get('stdout', Subprocess.PIPE),
+            'stderr': self._kwargs.get('stderr', Subprocess.PIPE),
+            'stdin': self._kwargs.get('stdin', Subprocess.PIPE)
+        }
 
-        self._process = subprocess.Popen(
-            arguments,
-            stdout=stdout,
-            stderr=stderr,
-            stdin=stdin
-        )
-
-        if is_python2_running():
-            self._process._stdout = stdout
-            self._process._stderr = stderr
+        try:
+            self._process = subprocess.Popen(
+                arguments,
+                **kwargs
+            )
+        except POPEN_EXCEPTIONS:
+            raise RunProcessError(
+                cmd=arguments[0],
+                process_args=arguments[1:],
+                process_kwargs=kwargs
+            )
 
 
 class _SubprocessMeta(type):
