@@ -1,5 +1,12 @@
 # Changes
 
+### 2020-03-20
+
+* Added support for non-blocking commands
+* Added option "wait" for running command
+* stdout and stderr of a command become stream
+* Improved test coverage
+
 ### 2020-02-29
 
 * Enabled support for list shell commands by dir(Shell)

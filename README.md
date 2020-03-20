@@ -16,19 +16,21 @@ This library is pretty easy to use:
 
 ```python
 from python_shell import Shell
+from python_shell.util.streaming import decode_stream
 
 Shell.ls('-l', '$HOME')  # Equals "ls -l $HOME"
 
 command = Shell.whoami()  # Equals "whoami"
-print(command.output)  # prints your current user name
-print(command)  # Does the same as above
+print(command)  # Prints representation of command in shell
 
 print(command.command)  # prints "whoami"
 print(repr(command))  # Does the same as above
 
-print(command.errors)  # prints text string from stderr
 print(command.return_code)  # prints "0"
 print(command.arguments)  # prints ""
+
+print(decode_stream(command.output)) # Prints out command's stdout
+print(decode_stream(command.errors)) # Prints out command's stderr
 ```
 
 To run any Bash command, you need to do it like this:
@@ -106,7 +108,7 @@ Other old versions of Python (e.g. 2.6, 3.4, etc) will never be supported. Howev
 
 Test coverage is one of the top priority for this library:
 - Coverage using Python 2.7: 96%
-- Coverage using Python 3.x: 92%
+- Coverage using Python 3.x: 93%
 
 ## Authors
 
