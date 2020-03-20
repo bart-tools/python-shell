@@ -48,3 +48,29 @@ class CommandDoesNotExist(ShellException):
 
     def __str__(self):
         return 'Command "{}" does not exist'.format(self._command.command)
+
+
+class UndefinedProcess(Exception):
+    """Raises when there's a try to use undefined process"""
+
+    def __str__(self):
+        return "Undefined process cannot be used"
+
+
+class RunProcessError(Exception):
+    """Raised when process fails to be run"""
+
+    def __init__(self,
+                 cmd,
+                 process_args=None,
+                 process_kwargs=None):
+
+        self._cmd = cmd
+        self._args = process_args
+        self._kwargs = process_kwargs
+
+    def __str__(self):
+        return "Fail to run '{cmd} {args}'".format(
+            cmd=self._cmd,
+            args=' '.join(self._args) if self._args else '',
+        )

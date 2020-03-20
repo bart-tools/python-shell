@@ -22,13 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-
-import itertools
-
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
-from python_shell.interfaces import ICommand
-from python_shell.util import Process
+from python_shell.command.interfaces import ICommand
+from python_shell.util import AsyncProcess
+from python_shell.util import SyncProcess
 from python_shell.util import Subprocess
 
 
@@ -38,47 +36,46 @@ __all__ = ('Command',)
 class Command(ICommand):
     """Simple decorator for shell commands"""
 
-    _arguments = []
     _process = None
     _command = None
 
     def _validate_command(self, command_name):
         try:
-            Subprocess.run(("which", command_name),
-                           check=True,
-                           stdout=Subprocess.DEVNULL())
+            SyncProcess(
+                "which",
+                command_name,
+                check=True,
+                stdout=Subprocess.DEVNULL
+            ).execute()
         except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)
 
-    @staticmethod
-    def _make_arguments(args, kwargs):
-        """Makes a list of arguments for Shell command"""
-        return list(map(str, args)) + list(itertools.chain(kwargs.items()))
-
-    def _make_command_execution_list(self, args, kwargs):
-        """Builds and returns a Shell command"""
-
-        self._arguments = self._make_arguments(args, kwargs)
-        return [self._command] + self._arguments
-
     def __init__(self, command_name):
         self._command = command_name
-        self._process = Process()
 
     def __call__(self, *args, **kwargs):
         """Executes the command with passed arguments
            and returns a Command instance"""
+
         self._validate_command(self._command)
-        self._process = Process(
-            Subprocess.run(
-                self._make_command_execution_list(
-                    args, kwargs),
-                stdout=Subprocess.PIPE,
-                stderr=Subprocess.PIPE
-            )
+
+        wait = kwargs.pop('wait', True)
+
+        process_cls = SyncProcess if wait else AsyncProcess
+
+        self._arguments = args
+
+        self._process = process_cls(
+            self._command,
+            *args,
+            **kwargs
         )
-        if self._process.returncode:
+
+        try:
+            self._process.execute()
+        except Subprocess.CalledProcessError:
             raise ShellException(self)
+
         return self
 
     @property
@@ -98,17 +95,19 @@ class Command(ICommand):
 
     @property
     def output(self):
-        """Returns a string output of the invoked command"""
+        """Returns an iterable object with output of the command"""
         return self._process.stdout
 
     @property
     def errors(self):
-        """Returns a string output of the invoked command from stderr """
+        """Returns an iterable object with output of the command
+           from stderr
+        """
         return self._process.stderr
 
     def __str__(self):
-        """Returns command's output as a string"""
-        return self.output
+        """Returns command's execution string"""
+        return repr(self)
 
     def __repr__(self):
         """Returns command's execution string"""

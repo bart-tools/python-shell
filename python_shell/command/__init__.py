@@ -22,16 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from python_shell.shell.processing.process import *
-from .terminal import *
-from .version import *
+from .command import *
+from .interfaces import *
 
 
 __all__ = (
-    'is_python2_running',
-    'get_current_terminal_name',
-    'Subprocess',
-    'Process',
-    'SyncProcess',
-    'AsyncProcess'
+    'Command',
+    'ICommand'
 )
