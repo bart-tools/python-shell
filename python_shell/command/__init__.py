@@ -22,38 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-import abc
-from six import with_metaclass
+from .command import *
+from .interfaces import *
 
 
-class IProcess(with_metaclass(abc.ABCMeta)):
-    """Interface for defining Process wrappers"""
-
-    @property
-    @abc.abstractmethod
-    def stderr(self):
-        """Returns stderr output of process"""
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def stdout(self):
-        """Returns stdout output of process"""
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def returncode(self):
-        """Returns returncode of process"""
-        raise NotImplementedError
-
-    @property
-    @abc.abstractmethod
-    def is_finished(self):
-        """Returns whether process has been completed"""
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def execute(self):
-        """Run the process instance"""
-        raise NotImplementedError
+__all__ = (
+    'Command',
+    'ICommand'
+)

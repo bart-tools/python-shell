@@ -34,6 +34,22 @@ from python_shell.util.streaming import decode_stream
 class SyncProcessTestCase(unittest.TestCase):
     """Test case for synchronous process wrapper"""
 
+    processes = []
+
+    def tearDown(self):
+        """Cleanup processes"""
+
+        for p in self.processes:
+            if not p._process:
+                continue
+            try:
+                p._process.terminate()
+                p._process.wait()
+            except OSError:
+                pass
+            p._process.stderr and p._process.stderr.close()
+            p._process.stdout and p._process.stdout.close()
+
     def _test_sync_process_is_finished(self):
         sync_process_args = ['echo', 'Hello']
         sync_process_kwargs = {
@@ -42,14 +58,15 @@ class SyncProcessTestCase(unittest.TestCase):
         }
         process = SyncProcess(*sync_process_args,
                               **sync_process_kwargs)
+        self.processes.append(process)
         process.execute()
         self.assertIsNotNone(process.returncode)
         self.assertTrue(process.is_finished)
 
-
     def _test_sync_process_not_initialized(self):
         """Check process which was not initialized"""
         process = SyncProcess(['ls'])
+        self.processes.append(process)
         self.assertIsNone(process.is_finished)
 
     def test_sync_process_property_is_finished(self):
@@ -74,16 +91,18 @@ class AsyncProcessTestCase(unittest.TestCase):
 
     processes = []
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self):
         """Cleanup processes"""
-        for p in cls.processes:
+        for p in self.processes:
+            if not p._process:
+                continue
             try:
                 p._process.terminate()
+                p._process.wait()
             except OSError:
                 pass
-            p._process.stderr.close()
-            p._process.stdout.close()
+            p._process.stderr and p._process.stderr.close()
+            p._process.stdout and p._process.stdout.close()
 
     def test_async_process_is_finished(self):
         timeout = 0.1  # seconds
@@ -124,6 +143,7 @@ class AsyncProcessTestCase(unittest.TestCase):
         """Check that AsyncProcess can be terminated properly"""
 
         process = AsyncProcess('yes')
+        self.processes.append(process)
         process.execute()
         process.terminate()
 
@@ -135,6 +155,7 @@ class AsyncProcessTestCase(unittest.TestCase):
 
         timeout = str(0.5)
         process = AsyncProcess('sleep', timeout)
+        self.processes.append(process)
         process.execute()
         process.wait()
         self.assertTrue(process.is_finished)

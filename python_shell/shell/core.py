@@ -32,7 +32,7 @@ from python_shell.util.terminal import get_current_terminal_name
 __all__ = ('Shell',)
 
 
-class __MetaShell(type):
+class MetaShell(type):
 
     __own_fields__ = ('last_command',)
 
@@ -45,9 +45,9 @@ class __MetaShell(type):
 
         if item in cls.__own_fields__:
             return cls.__dict__[item]
-        else:
-            cls._last_command = Command(item)
-            return cls._last_command
+
+        cls._last_command = Command(item)
+        return cls._last_command
 
     def __dir__(cls):
         """Return list of available shell commands + own fields"""
@@ -63,7 +63,7 @@ class __MetaShell(type):
         return cls._last_command
 
 
-class Shell(with_metaclass(__MetaShell)):
+class Shell(with_metaclass(MetaShell)):
     """Simple decorator for Terminal using Subprocess"""
 
     _last_command = None

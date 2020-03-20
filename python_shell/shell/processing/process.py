@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import abc
 import os
 import subprocess
-# from typing import Text, Union
 
 from six import with_metaclass
 
-from python_shell.exceptions import POPEN_EXCEPTIONS
 from python_shell.exceptions import RunProcessError
 from python_shell.exceptions import UndefinedProcess
 from python_shell.shell.processing.interfaces import IProcess
@@ -48,6 +47,8 @@ if is_python2_running():
         """
 
         def __init__(self, returncode, cmd, output=None, stderr=None):
+            super(_CalledProcessError, self).__init__()
+
             self.returncode = returncode
             self.cmd = cmd
             self.stdout = output
@@ -64,7 +65,7 @@ else:
 class StreamIterator(object):
     """A wrapper for retrieving data from subprocess streams"""
 
-    def __init__(self, stream = None):
+    def __init__(self, stream=None):
         """Initialize object with passed stream.
 
         If stream is None, that means process is undefined,
@@ -169,8 +170,8 @@ class Process(IProcess):
         if self._process:
             self._process.terminate()
 
-            # NOTE(albartash): It's needed, otherwise termination can happen slower
-            #                  than next call of poll().
+            # NOTE(albartash): It's needed, otherwise termination can happen
+            #                  slower than next call of poll().
             self._process.wait()
         else:
             raise UndefinedProcess
@@ -182,6 +183,12 @@ class Process(IProcess):
             self._process.wait()
         else:
             raise UndefinedProcess
+
+    @abc.abstractmethod
+    def execute(self):
+        """Abstract method, to be implemented in derived classes"""
+
+        raise NotImplementedError
 
 
 class SyncProcess(Process):
@@ -204,7 +211,7 @@ class SyncProcess(Process):
                 arguments,
                 **kwargs
             )
-        except POPEN_EXCEPTIONS:
+        except (OSError, ValueError):
             raise RunProcessError(
                 cmd=arguments[0],
                 process_args=arguments[1:],
@@ -243,7 +250,7 @@ class AsyncProcess(Process):
                 arguments,
                 **kwargs
             )
-        except POPEN_EXCEPTIONS:
+        except (OSError, ValueError):
             raise RunProcessError(
                 cmd=arguments[0],
                 process_args=arguments[1:],

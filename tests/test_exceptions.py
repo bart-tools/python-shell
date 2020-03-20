@@ -26,6 +26,8 @@ import time
 import unittest
 
 from python_shell.command import Command
+from python_shell.shell.processing.process import AsyncProcess
+from python_shell.shell.processing.process import SyncProcess
 from python_shell import exceptions
 
 
@@ -44,3 +46,30 @@ class ExceptionTestCase(unittest.TestCase):
             raise exceptions.CommandDoesNotExist(cmd)
         self.assertEqual(str(context.exception),
                          'Command "{}" does not exist'.format(cmd_name))
+
+    def test_undefined_process(self):
+        """Check exception for Undefined process"""
+
+        for method in ('wait', 'terminate'):
+            for process_cls in (SyncProcess, AsyncProcess):
+                try:
+                    process = process_cls('ls')
+                    getattr(process, method)()
+                except exceptions.UndefinedProcess as e:
+                    self.assertEqual(str(e),
+                                     "Undefined process cannot be used")
+                else:
+                    self.fail("UndefinedProcess was not thrown")
+
+    def test_run_process_error(self):
+        """Check exception for running process"""
+
+        for process_cls in (SyncProcess, AsyncProcess):
+            try:
+                process = process_cls('sleepa', 'asd')
+                process.execute()
+            except exceptions.RunProcessError as e:
+                error = "Fail to run 'sleepa asd'"
+                self.assertEqual(error, str(e))
+            else:
+                self.fail("RunProcessError was not thrown")

@@ -60,18 +60,17 @@ class UndefinedProcess(Exception):
 class RunProcessError(Exception):
     """Raised when process fails to be run"""
 
-    def __init__(self, cmd, process_args = None, process_kwargs = None):
+    def __init__(self,
+                 cmd,
+                 process_args=None,
+                 process_kwargs=None):
+
         self._cmd = cmd
         self._args = process_args
         self._kwargs = process_kwargs
 
     def __str__(self):
-        return "Fail to run {cmd} {args} ({kwargs})".format(
+        return "Fail to run '{cmd} {args}'".format(
             cmd=self._cmd,
             args=' '.join(self._args) if self._args else '',
-            kwargs=', '.join(self._kwargs.items()) if self._kwargs else ''
         )
-
-
-POPEN_EXCEPTIONS = {OSError, ValueError}
-

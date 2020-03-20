@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from python_shell.interfaces import ICommand
+from python_shell.command.interfaces import ICommand
 from python_shell.shell.processing.interfaces import IProcess
 from python_shell.shell.terminal.interfaces import ITerminalIntegration
 
@@ -87,3 +87,7 @@ class FakeProcess(IProcess):
     @property
     def is_finished(self):
         return super(FakeProcess, self).is_finished
+
+    @property
+    def execute(self):
+        return super(FakeProcess, self).execute()

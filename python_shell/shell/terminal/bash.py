@@ -43,11 +43,11 @@ class BashTerminalIntegration(BaseTerminalIntegration):
     def _get_available_commands(self):
         """Reload available commands from shell"""
         process = SyncProcess(
-                self._shell_name, '-c', 'compgen -c',
-                stdout=Subprocess.PIPE,
-                stderr=Subprocess.DEVNULL,
-                check=True
-            )
+            self._shell_name, '-c', 'compgen -c',
+            stdout=Subprocess.PIPE,
+            stderr=Subprocess.DEVNULL,
+            check=True
+        )
         process.execute()
         return decode_stream(process.stdout).split()
 

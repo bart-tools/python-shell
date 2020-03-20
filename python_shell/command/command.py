@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 from python_shell.exceptions import CommandDoesNotExist
 from python_shell.exceptions import ShellException
-from python_shell.interfaces import ICommand
+from python_shell.command.interfaces import ICommand
 from python_shell.util import AsyncProcess
 from python_shell.util import SyncProcess
 from python_shell.util import Subprocess
@@ -41,10 +41,12 @@ class Command(ICommand):
 
     def _validate_command(self, command_name):
         try:
-            SyncProcess("which", command_name,
-                        check=True,
-                        stdout=Subprocess.DEVNULL
-                        ).execute()
+            SyncProcess(
+                "which",
+                command_name,
+                check=True,
+                stdout=Subprocess.DEVNULL
+            ).execute()
         except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)
 
@@ -98,7 +100,9 @@ class Command(ICommand):
 
     @property
     def errors(self):
-        """Returns an iterable object with output of the command from stderr """
+        """Returns an iterable object with output of the command
+           from stderr
+        """
         return self._process.stderr
 
     def __str__(self):

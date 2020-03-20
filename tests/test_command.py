@@ -75,3 +75,13 @@ class CommandTestCase(unittest.TestCase):
         args = ('-l', '-a', '/tmp')
         command = Command('ls')(*args)
         self.assertEqual(repr(command), ' '.join((command.command,) + args))
+
+    def test_command_properties(self):
+        """Check all command properties"""
+
+        cmd_name = 'ls'
+        args = ('-l', '/tmp')
+        cmd = Command(cmd_name)(*args)
+
+        self.assertEqual(cmd.command, cmd_name)
+        self.assertEqual(cmd.arguments, ' '.join(args))
