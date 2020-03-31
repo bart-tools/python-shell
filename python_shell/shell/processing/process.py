@@ -159,6 +159,11 @@ class Process(IProcess):
             return self.returncode == self.PROCESS_IS_TERMINATED_CODE
         return None
 
+    @property
+    def is_undefined(self):
+        """Returns whether process is undefined"""
+        return self._process is None
+
     def _make_command_execution_list(self, args):
         """Builds and returns a Shell command"""
 

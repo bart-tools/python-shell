@@ -57,3 +57,9 @@ class IProcess(with_metaclass(abc.ABCMeta)):
     def execute(self):
         """Run the process instance"""
         raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def is_undefined(self):
+        """Returns whether process is undefined"""
+        raise NotImplementedError
