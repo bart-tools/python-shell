@@ -91,3 +91,7 @@ class FakeProcess(IProcess):
     @property
     def execute(self):
         return super(FakeProcess, self).execute()
+
+    @property
+    def is_undefined(self):
+        return super(FakeProcess, self).is_undefined

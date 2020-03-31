@@ -67,7 +67,7 @@ class SyncProcessTestCase(unittest.TestCase):
         """Check process which was not initialized"""
         process = SyncProcess(['ls'])
         self.processes.append(process)
-        self.assertIsNone(process.is_finished)
+        self.assertTrue(process.is_undefined)
 
     def test_sync_process_property_is_finished(self):
         """Check that is_finished works well for SyncProcess"""
@@ -118,6 +118,7 @@ class AsyncProcessTestCase(unittest.TestCase):
         timeout = 0.5  # seconds
         process = AsyncProcess('sleep', str(timeout))
         self.processes.append(process)
+        self.assertTrue(process.is_undefined)
         process.execute()
         self.assertIsNone(process.returncode)
         time.sleep(timeout + 0.5)

@@ -72,7 +72,7 @@ class ProcessInterfaceTestCase(BaseInterfaceTestCase):
     """Test case for Process interface"""
 
     implementation_class = interfaces.FakeProcess
-    properties = ('stderr', 'stdout', 'returncode', 'is_finished', 'execute')
+    properties = ('stderr', 'stdout', 'returncode', 'is_finished', 'execute', 'is_undefined')
 
     def test_process_interface(self):
         self._check_properties()
