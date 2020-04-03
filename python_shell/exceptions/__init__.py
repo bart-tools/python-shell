@@ -24,3 +24,11 @@ THE SOFTWARE.
 
 from .process import *
 from .shell import *
+
+
+__all__ = (
+    'CommandDoesNotExist',
+    'RunProcessError',
+    'ShellException',
+    'UndefinedProcess'
+)
