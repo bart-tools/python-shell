@@ -22,35 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-__all__ = ('CommandDoesNotExist', 'ShellException')
+from .base import BaseShellException
 
 
-class ShellException(Exception):
-    """Defines any exception caused by commands run in Shell"""
-
-    _command = None
-
-    def __init__(self, command):
-        super(ShellException, self).__init__()
-        self._command = command
-
-    def __str__(self):
-        return 'Shell command "{} {}" failed with return code {}'.format(
-            self._command.command,
-            self._command.arguments,
-            self._command.return_code)
+__all__ = ('RunProcessError', 'UndefinedProcess')
 
 
-class CommandDoesNotExist(ShellException):
-    """Defines an exception when command does not exist in the environment"""
-    def __init__(self, command):
-        super(CommandDoesNotExist, self).__init__(command)
-
-    def __str__(self):
-        return 'Command "{}" does not exist'.format(self._command.command)
+class ProcessException(BaseShellException):
+    """General exception class for Process failures"""
 
 
-class UndefinedProcess(Exception):
+class UndefinedProcess(ProcessException):
     """Raises when there's a try to use undefined process"""
 
     def __str__(self):
