@@ -43,7 +43,7 @@ class ShellTestCase(unittest.TestCase):
     def test_own_fields(self):
         """Check Shell own fields to be accessible"""
         for field in ('last_command',):
-            getattr(Shell, field)
+            self.assertIsNotNone(getattr(Shell, field))
 
     def test_shell_non_zero_return_code(self):
         """Check the case when Shell command returns non-zero code"""

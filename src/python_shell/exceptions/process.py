@@ -22,7 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
+from .base import BaseShellException
 
 
-__all__ = ('Shell',)
+__all__ = ('RunProcessError', 'UndefinedProcess')
+
+
+class ProcessException(BaseShellException):
+    """General exception class for Process failures"""
+
+
+class UndefinedProcess(ProcessException):
+    """Raises when there's a try to use undefined process"""
+
+    def __str__(self):
+        return "Undefined process cannot be used"
+
+
+class RunProcessError(Exception):
+    """Raised when process fails to be run"""
+
+    def __init__(self,
+                 cmd,
+                 process_args=None,
+                 process_kwargs=None):
+
+        self._cmd = cmd
+        self._args = process_args
+        self._kwargs = process_kwargs
+
+    def __str__(self):
+        return "Fail to run '{cmd} {args}'".format(
+            cmd=self._cmd,
+            args=' '.join(self._args) if self._args else '',
+        )

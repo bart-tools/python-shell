@@ -26,9 +26,20 @@ import time
 import unittest
 
 from python_shell.shell.processing.process import AsyncProcess
+from python_shell.shell.processing.process import Process
+from python_shell.shell.processing.process import StreamIterator
 from python_shell.shell.processing.process import SyncProcess
 from python_shell.shell.processing.process import Subprocess
 from python_shell.util.streaming import decode_stream
+
+
+class FakeBaseProcess(Process):
+    """Fake Process implementation"""
+
+    def execute(self):
+        """Wrapper for running execute() of parent"""
+
+        return super(FakeBaseProcess, self).execute()
 
 
 class SyncProcessTestCase(unittest.TestCase):
@@ -59,6 +70,11 @@ class SyncProcessTestCase(unittest.TestCase):
         process = SyncProcess(*sync_process_args,
                               **sync_process_kwargs)
         self.processes.append(process)
+
+        self.assertIsNone(process.returncode)
+        self.assertIsNone(process.is_finished)
+        self.assertIsNone(process.is_terminated)
+
         process.execute()
         self.assertIsNotNone(process.returncode)
         self.assertTrue(process.is_finished)
@@ -67,7 +83,7 @@ class SyncProcessTestCase(unittest.TestCase):
         """Check process which was not initialized"""
         process = SyncProcess(['ls'])
         self.processes.append(process)
-        self.assertIsNone(process.is_finished)
+        self.assertTrue(process.is_undefined)
 
     def test_sync_process_property_is_finished(self):
         """Check that is_finished works well for SyncProcess"""
@@ -108,6 +124,11 @@ class AsyncProcessTestCase(unittest.TestCase):
         timeout = 0.1  # seconds
         process = AsyncProcess('sleep', str(timeout))
         self.processes.append(process)
+
+        self.assertIsNone(process.returncode)
+        self.assertIsNone(process.is_finished)
+        self.assertIsNone(process.is_terminated)
+
         process.execute()
         self.assertIsNone(process.returncode)
         time.sleep(timeout + 1)  # ensure command finishes
@@ -118,6 +139,7 @@ class AsyncProcessTestCase(unittest.TestCase):
         timeout = 0.5  # seconds
         process = AsyncProcess('sleep', str(timeout))
         self.processes.append(process)
+        self.assertTrue(process.is_undefined)
         process.execute()
         self.assertIsNone(process.returncode)
         time.sleep(timeout + 0.5)
@@ -160,3 +182,24 @@ class AsyncProcessTestCase(unittest.TestCase):
         process.wait()
         self.assertTrue(process.is_finished)
         self.assertEqual(process.returncode, 0)
+
+
+class ProcessTestCase(unittest.TestCase):
+    """Test case for Process class"""
+
+    def test_execution_of_base_process(self):
+        """Check execution of Process instance"""
+
+        with self.assertRaises(NotImplementedError):
+            FakeBaseProcess(None).execute()
+
+
+class StreamIteratorTestCase(unittest.TestCase):
+    """Test case for StreamIterator instance"""
+
+    def test_stream_is_not_set(self):
+        """Check work of iterator when stream is not passed"""
+
+        stream = StreamIterator(stream=None)
+        with self.assertRaises(StopIteration):
+            next(stream)

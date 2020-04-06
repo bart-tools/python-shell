@@ -66,7 +66,7 @@ class FakeTerminal(ITerminalIntegration):
 
     @property
     def shell_name(self):
-        return super(FakeTerminal, self).available_commands
+        return super(FakeTerminal, self).shell_name
 
 
 class FakeProcess(IProcess):
@@ -88,6 +88,9 @@ class FakeProcess(IProcess):
     def is_finished(self):
         return super(FakeProcess, self).is_finished
 
-    @property
     def execute(self):
         return super(FakeProcess, self).execute()
+
+    @property
+    def is_undefined(self):
+        return super(FakeProcess, self).is_undefined
