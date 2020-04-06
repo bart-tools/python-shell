@@ -29,6 +29,8 @@ This library supports the next Python versions:
 | 3.0     |    No     |
 | **2.7** | **Yes**   |
 | <=2.6   |    No     |
+| **PyPy 2** | **Yes** |
+| **PyPy 3** | **Yes** | 
 
 <br/>
 
