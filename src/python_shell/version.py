@@ -22,10 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .shell import Shell
-from .version import get_version
+import pkg_resources
 
 
-__all__ = ('Shell',)
+__all__ = ('get_version',)
 
-__version__ = get_version()
+
+def get_version():
+    """Retrieves version of the current root package"""
+
+    return pkg_resources.require('python_shell')[0].version.strip()
