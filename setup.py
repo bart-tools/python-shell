@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 from setuptools import find_packages
 from setuptools import setup
-from os import path
+import os
 import sys
 
 
@@ -32,14 +32,19 @@ if sys.version_info[0] == 2:
     from io import open
 
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read().strip()
+
+
+with open(os.path.join(here, 'VERSION'), encoding='utf-8') as f:
+    version = f.read()
+
 
 setup(
     name='python-shell',
-    version='1.0.3',
+    version=version,
     description='Python Shell Wrapper library',
     long_description=long_description,
     long_description_content_type='text/markdown',
