@@ -17,6 +17,7 @@ This library supports the next Python versions:
 
 | &nbsp;&nbsp;Version&nbsp;&nbsp; | &nbsp;&nbsp;Supported&nbsp;&nbsp; |
 |:-------:|:---------:|
+| **3.9** | **Yes**   |
 | **3.8** | **Yes**   |
 | **3.7** | **Yes**   |
 | **3.6** | **Yes**   |
