@@ -21,6 +21,9 @@ Supported environments:
 - py36
 - py37
 - py38
+- py39
+- pypy (based on Python 2.7)
+- pypy3 (based on Python 3.6)
 
 ## Test coverage
 
