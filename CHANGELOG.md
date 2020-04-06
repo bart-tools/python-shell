@@ -1,5 +1,14 @@
 # Changes
 
+### 2020-03-06
+
+* Added support for Python 3.9 and PyPy
+* Added proper documentation (based on mkdocs)
+* Added property _is_undefined_ for processes
+* Added `__version__` for the root package
+* Refactoring in exception classes
+* Added usage of **flake8** in Tox configurations
+
 ### 2020-03-20
 
 * Added support for non-blocking commands

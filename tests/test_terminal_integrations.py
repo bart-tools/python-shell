@@ -25,8 +25,20 @@ THE SOFTWARE.
 import unittest
 
 from python_shell.shell import terminal
+from python_shell.shell.terminal.base import BaseTerminalIntegration
+
 
 __all__ = ('TerminalIntegrationTestCase',)
+
+
+class FakeBaseTerminal(BaseTerminalIntegration):
+    """Fake terminal integration for BaseTerminalIntegration"""
+
+    @property
+    def available_commands(self):
+        """Wrapper to call parent's property"""
+
+        return super(FakeBaseTerminal, self).available_commands
 
 
 class TerminalIntegrationTestCase(unittest.TestCase):
@@ -36,6 +48,21 @@ class TerminalIntegrationTestCase(unittest.TestCase):
         """Check available commands to be non-empty list"""
         term = getattr(terminal, integration_class_name)()
         self.assertLess(0, len(term.available_commands))
+
+
+class BaseTerminalIntegrationTestCase(TerminalIntegrationTestCase):
+    """Test case for Base terminal integration class"""
+
+    def test_shell_name(self):
+        """Check 'shell_name' property for Base terminal class"""
+
+        self.assertIsNone(FakeBaseTerminal().shell_name)
+
+    def test_available_commands(self):
+        """Check 'available_commands' property for Base terminal class"""
+
+        with self.assertRaises(NotImplementedError):
+            _ = FakeBaseTerminal().available_commands
 
 
 class BashTerminalIntegrationTestCase(TerminalIntegrationTestCase):

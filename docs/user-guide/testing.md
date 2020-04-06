@@ -30,8 +30,8 @@ Supported environments:
 Test coverage is one of the top priority for this library.
 For the latest release:
 
-- Coverage using Python 2.7: 96%
-- Coverage using Python 3.x: 93%
+- Coverage using Python 2.7: 98%
+- Coverage using Python 3.x: 96%
 
 Tox environments:
 
