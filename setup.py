@@ -56,6 +56,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: Implementation :: CPython',
     ],
     keywords='python shell bash',
     packages=find_packages(where='src', exclude=['tests']),

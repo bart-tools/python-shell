@@ -16,7 +16,7 @@ Changes:
 Date: no date
 
 Changes:
-* By technical accident, release 1.0.2 was skipped.
+* Due to technical accident, release 1.0.2 was skipped.
 
 ## Release 1.0.1
 

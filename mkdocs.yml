@@ -1,1 +1,24 @@
-site_name: The python-shell library
+site_name: Python-Shell
+site_author: Alex Sokolov
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - Quickstart: user-guide/getting-started.md
+      - Installation: user-guide/installation.md
+      - Testing: user-guide/testing.md
+      - Integrations: user-guide/integrations.md
+  - Tutorial: tutorial/tutorial.md
+  - About:
+      - Releases: releases.md
+      - License: license.md
+
+repo_url: https://github.com/bart-tools/python-shell
+
+theme:
+  name: readthedocs
+
+authors:
+    - Alex Sokolov
+
+copyright: Copyright &copy; 2020 <a href="https://github.com/albartash">Alex Sokolov</a>.
