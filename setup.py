@@ -27,6 +27,7 @@ from setuptools import setup
 from os import path
 import sys
 
+
 if sys.version_info[0] == 2:
     from io import open
 
@@ -57,7 +58,8 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     keywords='python shell bash',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(where='src', exclude=['tests']),
+    package_dir={'': 'src'},
     python_requires='>2.7.*, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4',
     install_requires=['six>=1.14.0'],
     project_urls={
