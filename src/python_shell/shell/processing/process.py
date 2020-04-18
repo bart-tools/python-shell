@@ -195,72 +195,63 @@ class Process(IProcess):
 
         raise NotImplementedError
 
+    def _create_subprocess(self):
+        """Initialize and start subprocess"""
+
+        arguments = self._make_command_execution_list(self._args)
+
+        kwargs = {
+            'stdout': self._kwargs.get('stdout', Subprocess.PIPE),
+            'stderr': self._kwargs.get('stderr', Subprocess.PIPE),
+            'stdin': self._kwargs.get('stdin', Subprocess.PIPE)
+        }
+
+        try:
+            self._process = subprocess.Popen(
+                arguments,
+                **kwargs
+            )
+        except (OSError, ValueError):
+            raise RunProcessError(
+                cmd=arguments[0],
+                process_args=arguments[1:],
+                process_kwargs=kwargs
+            )
+
 
 class SyncProcess(Process):
     """Process subclass for running process
     with waiting for its completion"""
 
-    def execute(self):
-        """Run a process in synchronous way"""
+    def _wait(self):
+        """Wait for subprocess to complete"""
 
-        arguments = self._make_command_execution_list(self._args)
-
-        kwargs = {
-            'stdout': self._kwargs.get('stdout', Subprocess.PIPE),
-            'stderr': self._kwargs.get('stderr', Subprocess.PIPE),
-            'stdin': self._kwargs.get('stdin', Subprocess.PIPE)
-        }
-
-        try:
-            self._process = subprocess.Popen(
-                arguments,
-                **kwargs
-            )
-        except (OSError, ValueError):
-            raise RunProcessError(
-                cmd=arguments[0],
-                process_args=arguments[1:],
-                process_kwargs=kwargs
-            )
-
-        if is_python2_running():  # Timeout is not supported in Python 2
-            self._process.wait()
-        else:
-            self._process.wait(timeout=self._kwargs.get('timeout', None))
+        _kwargs = {}
+        if not is_python2_running():  # Timeout is supported in Python 3 only
+            _kwargs['timeout'] = self._kwargs.get('timeout', None)
+        self._process.wait(**_kwargs)
 
         if self._process.returncode and self._kwargs.get('check', True):
+            # TODO(albartash): Ongoing refactoring, needs to be cached
+            arguments = self._make_command_execution_list(self._args)
             raise Subprocess.CalledProcessError(
                 returncode=self._process.returncode,
                 cmd=str(arguments)
             )
 
+    def execute(self):
+        """Run a process in synchronous way"""
+        self._create_subprocess()
+        self._wait()
+
 
 class AsyncProcess(Process):
     """Process subclass for running process
-    with waiting for its completion"""
+    without waiting for its completion"""
 
     def execute(self):
         """Run a process in asynchronous way"""
-
-        arguments = self._make_command_execution_list(self._args)
-
-        kwargs = {
-            'stdout': self._kwargs.get('stdout', Subprocess.PIPE),
-            'stderr': self._kwargs.get('stderr', Subprocess.PIPE),
-            'stdin': self._kwargs.get('stdin', Subprocess.PIPE)
-        }
-
-        try:
-            self._process = subprocess.Popen(
-                arguments,
-                **kwargs
-            )
-        except (OSError, ValueError):
-            raise RunProcessError(
-                cmd=arguments[0],
-                process_args=arguments[1:],
-                process_kwargs=kwargs
-            )
+        self._create_subprocess()
 
 
 class _SubprocessMeta(type):
