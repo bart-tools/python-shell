@@ -108,6 +108,7 @@ class Process(IProcess):
     def __init__(self, command, *args, **kwargs):
         self._command = command
         self._args = args
+        self._redirections = kwargs.pop('redirections', [])
         self._kwargs = kwargs
 
     @property

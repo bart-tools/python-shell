@@ -23,8 +23,11 @@ THE SOFTWARE.
 """
 
 from python_shell.exceptions import CommandDoesNotExist
+from python_shell.exceptions import RedirectionParseError
 from python_shell.exceptions import ShellException
 from python_shell.command.interfaces import ICommand
+from python_shell.command.redirection import REDIRECTION_TYPES
+from python_shell.command.redirection import Redirection
 from python_shell.util import AsyncProcess
 from python_shell.util import SyncProcess
 from python_shell.util import Subprocess
@@ -50,6 +53,40 @@ class Command(ICommand):
         except Subprocess.CalledProcessError:
             raise CommandDoesNotExist(self)
 
+    def _split_out_redirections(self, args):
+        """Returns regular arguments and redirections separately"""
+
+        regular_args = []
+        redirections = []
+
+        i = 0
+        count = len(args)
+
+        while i < count:
+            if args[i] in REDIRECTION_TYPES:
+                redirection_type = args[i]
+
+                i += 1
+
+                if i == count:
+                    raise RedirectionParseError(
+                        redirection_type=redirection_type,
+                        reason='Output handler is not provided'
+                    )
+
+                output_handler = Redirection(
+                    redirection_type=redirection_type,
+                    output_stream=args[i]
+                )
+
+                redirections.append(output_handler)
+            else:
+                regular_args.append(args[i])
+
+            i += 1
+
+        return regular_args, redirections
+
     def __init__(self, command_name):
         self._command = command_name
 
@@ -63,11 +100,12 @@ class Command(ICommand):
 
         process_cls = SyncProcess if wait else AsyncProcess
 
-        self._arguments = args
+        self._arguments, redirections = self._split_out_redirections(args)
 
         self._process = process_cls(
             self._command,
-            *args,
+            *self._arguments,
+            redirections=redirections,
             **kwargs
         )
 

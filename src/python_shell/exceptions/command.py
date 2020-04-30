@@ -22,16 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from .command import *
-from .process import *
-from .shell import *
+# from typing import Optional, Text
+
+from python_shell.exceptions.base import BaseShellException
 
 
-__all__ = (
-    'CommandDoesNotExist',
-    'CommandException',
-    'RedirectionParseError',
-    'RunProcessError',
-    'ShellException',
-    'UndefinedProcess'
-)
+__all__ = ('CommandException', 'RedirectionParseError')
+
+
+class CommandException(BaseShellException):
+    """Base exception class for errors in Commands"""
+
+
+class RedirectionParseError(CommandException):
+    """Exception for errors while parsing redirection expressions"""
+
+    def __init__(self,
+                 redirection_type=None,  # Optional[Text]
+                 reason=None
+                 ):
+        self._redirection_type = redirection_type
+        self._reason = reason
+
+    def __str__(self):
+        expr_type = ' for type "{}"'.format(
+            self._redirection_type) if self._redirection_type else ''
+        reason = ': {}'.format(self._reason) if self._reason else ''
+        return "Invalid redirection expression{expr_type}{reason}".format(
+            expr_type=expr_type,
+            reason=reason
+        )
