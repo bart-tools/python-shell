@@ -1,3 +1,6 @@
+# THIS REPOSITORY IS NO LONGER MAINTAINED
+New repository is here: https://github.com/ATCode-space/python-shell
+
 # Python Shell Wrapper Library
 
 A flexible, easy-to-use library to integrate your Python script with Unix ecosystems.
