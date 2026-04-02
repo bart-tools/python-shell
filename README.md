@@ -1,5 +1,5 @@
 # THIS REPOSITORY IS NO LONGER MAINTAINED
-New repository is here: https://github.com/ATCode-space/python-shell
+New repository is here: https://github.com/ATCode-Solutions/python-shell
 
 
 # Python Shell Wrapper Library
